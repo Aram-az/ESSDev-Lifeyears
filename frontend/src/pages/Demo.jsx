@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 function Demo() {
   const [recommendations, setRecommendations] = useState(null);
@@ -8,90 +10,134 @@ function Demo() {
   const [loading, setLoading] = useState({});
   const [error, setError] = useState({});
 
-  // Health check endpoint
+  // Health check endpoint with timeout
   const checkHealth = async () => {
     setLoading(prev => ({ ...prev, health: true }));
     setError(prev => ({ ...prev, health: null }));
     try {
-      const response = await fetch('/api/health');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/api/health`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setHealthCheck(data);
     } catch (err) {
-      setError(prev => ({ ...prev, health: err.message || 'Failed to fetch' }));
+      if (err.name === 'AbortError') {
+        setError(prev => ({ ...prev, health: 'Request timed out. Is the backend server running?' }));
+      } else {
+        setError(prev => ({ ...prev, health: err.message || 'Failed to fetch' }));
+      }
       console.error('Health check error:', err);
     } finally {
       setLoading(prev => ({ ...prev, health: false }));
     }
   };
 
-  // Fetch recommendations
+  // Fetch recommendations with timeout
   const fetchRecommendations = async () => {
     setLoading(prev => ({ ...prev, recommendations: true }));
     setError(prev => ({ ...prev, recommendations: null }));
     try {
-      const response = await fetch('/api/recommendations');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/api/recommendations`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setRecommendations(data);
     } catch (err) {
-      setError(prev => ({ ...prev, recommendations: err.message || 'Failed to fetch' }));
+      if (err.name === 'AbortError') {
+        setError(prev => ({ ...prev, recommendations: 'Request timed out' }));
+      } else {
+        setError(prev => ({ ...prev, recommendations: err.message || 'Failed to fetch' }));
+      }
       console.error('Recommendations fetch error:', err);
     } finally {
       setLoading(prev => ({ ...prev, recommendations: false }));
     }
   };
 
-  // Fetch prevention data
+  // Fetch prevention data with timeout
   const fetchPrevention = async () => {
     setLoading(prev => ({ ...prev, prevention: true }));
     setError(prev => ({ ...prev, prevention: null }));
     try {
-      const response = await fetch('/api/prevention');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/api/prevention`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setPrevention(data);
     } catch (err) {
-      setError(prev => ({ ...prev, prevention: err.message || 'Failed to fetch' }));
+      if (err.name === 'AbortError') {
+        setError(prev => ({ ...prev, prevention: 'Request timed out' }));
+      } else {
+        setError(prev => ({ ...prev, prevention: err.message || 'Failed to fetch' }));
+      }
       console.error('Prevention fetch error:', err);
     } finally {
       setLoading(prev => ({ ...prev, prevention: false }));
     }
   };
 
-  // Fetch longevity data
+  // Fetch longevity data with timeout
   const fetchLongevity = async () => {
     setLoading(prev => ({ ...prev, longevity: true }));
     setError(prev => ({ ...prev, longevity: null }));
     try {
-      const response = await fetch('/api/longevity');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/api/longevity`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setLongevity(data);
     } catch (err) {
-      setError(prev => ({ ...prev, longevity: err.message || 'Failed to fetch' }));
+      if (err.name === 'AbortError') {
+        setError(prev => ({ ...prev, longevity: 'Request timed out' }));
+      } else {
+        setError(prev => ({ ...prev, longevity: err.message || 'Failed to fetch' }));
+      }
       console.error('Longevity fetch error:', err);
     } finally {
       setLoading(prev => ({ ...prev, longevity: false }));
     }
   };
 
-  // Auto-check health on mount
-  useEffect(() => {
-    // Small delay to ensure MSW is ready
-    const timer = setTimeout(() => {
-      checkHealth();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Auto-check health on mount (optional - commented out to prevent hanging)
+  // Uncomment if you want auto health check on page load
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     checkHealth();
+  //   }, 500);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -102,16 +148,17 @@ function Demo() {
         <p className="text-gray-600 mb-4">
           This page demonstrates the mock API endpoints for Developer 4's tasks.
         </p>
+        <p className="text-sm text-gray-500 mb-4">
+          API Server: <code className="bg-gray-200 px-2 py-1 rounded">{API_BASE_URL}</code>
+        </p>
         {(error.health || error.recommendations || error.prevention || error.longevity) && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
             <p className="font-semibold mb-2">⚠️ Troubleshooting "Failed to fetch" errors:</p>
             <ul className="text-sm list-disc list-inside space-y-1">
-              <li>Open browser DevTools (F12) and check the Console tab</li>
-              <li>Look for "✅ MSW initialized successfully" message</li>
-              <li>Check Application tab → Service Workers to verify registration</li>
-              <li>Try hard refresh (Ctrl+Shift+R or Cmd+Shift+R)</li>
-              <li>Clear browser cache and reload the page</li>
-              <li>Ensure you're running in development mode (npm run dev)</li>
+              <li>Ensure the backend server is running: <code>cd backend && npm run dev</code></li>
+              <li>Check that the server is accessible at {API_BASE_URL}</li>
+              <li>Open browser DevTools (F12) and check the Console tab for errors</li>
+              <li>Verify CORS is enabled on the backend server</li>
             </ul>
           </div>
         )}

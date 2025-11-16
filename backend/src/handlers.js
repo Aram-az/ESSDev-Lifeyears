@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { mockRecommendations, mockPreventionData, mockLongevityData } from './data';
+import { mockRecommendations, mockPreventionData, mockLongevityData } from './data.js';
 
 export const handlers = [
   // Get all recommendations
@@ -68,8 +68,9 @@ export const handlers = [
   http.get('/api/health', () => {
     return HttpResponse.json({
       success: true,
-      message: 'Mock API is running',
-      timestamp: new Date().toISOString()
+      message: 'Mock API server is running',
+      timestamp: new Date().toISOString(),
+      server: 'MSW Backend Server'
     });
   })
 ];
