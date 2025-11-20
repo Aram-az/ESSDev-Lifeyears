@@ -13,7 +13,7 @@ function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
-            <Link href="/" className="text-xl font-bold text-gray-800">
+            <Link to="/" className="text-xl font-bold text-gray-800">
               ESSDev Lifeyears
             </Link>
           </div>
@@ -44,12 +44,6 @@ function Navbar() {
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Profile
-              </Link>
-              <Link
-                to="/demo"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Demo
               </Link>
             </div>
           </div>
@@ -129,13 +123,6 @@ function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               Profile
-            </Link>
-            <Link
-              to="/demo"
-              className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Demo
             </Link>
           </div>
         </div>

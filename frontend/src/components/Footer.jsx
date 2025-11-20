@@ -1,65 +1,69 @@
+import { Link } from "react-router-dom";
+
 function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <footer className="bg-gray-800 text-white mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-base font-semibold mb-2 text-white">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 text-white">
               ESSDev Lifeyears
             </h3>
-            <p className="text-gray-300 text-xs">
+            <p className="text-gray-300 text-sm">
               Building solutions for a healthier future.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-base font-semibold mb-2 text-white">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 text-white">
               Quick Links
             </h3>
-            <ul className="space-y-1 text-xs">
+            <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="#home"
-                  className="text-gray-300 hover:text-white transition-colors"
+                <Link
+                  to="/"
+                  className="text-gray-300 hover:text-white transition-colors block"
                 >
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#about"
-                  className="text-gray-300 hover:text-white transition-colors"
+                <Link
+                  to="/dashboard-temp"
+                  className="text-gray-300 hover:text-white transition-colors block"
                 >
-                  About
-                </a>
+                  Dashboard
+                </Link>
               </li>
               <li>
-                <a
-                  href="#services"
-                  className="text-gray-300 hover:text-white transition-colors"
+                <Link
+                  to="/onboarding-temp"
+                  className="text-gray-300 hover:text-white transition-colors block"
                 >
-                  Services
-                </a>
+                  Onboarding
+                </Link>
               </li>
               <li>
-                <a
-                  href="#contact"
-                  className="text-gray-300 hover:text-white transition-colors"
+                <Link
+                  to="/profile-temp"
+                  className="text-gray-300 hover:text-white transition-colors block"
                 >
-                  Contact
-                </a>
+                  Profile
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-base font-semibold mb-2 text-white">Contact</h3>
-            <ul className="space-y-1 text-xs text-gray-300">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 text-white">
+              Contact
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>Email: text@placeholder.com</li>
               <li>Phone: (123) 456-7890</li>
             </ul>
@@ -67,7 +71,7 @@ function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-700 mt-4 pt-4 text-center text-xs text-gray-300">
+        <div className="border-t border-gray-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm text-gray-300">
           <p>&copy; {currentYear} ESSDev Lifeyears. All rights reserved.</p>
         </div>
       </div>
