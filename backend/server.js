@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { setupServer } from 'msw/node';
 import { handlers } from './src/handlers.js';
-import { mockRecommendations, mockPreventionData, mockLongevityData } from './src/data.js';
+import { mockUser, mockRecommendationsFromJson } from './src/data.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -26,85 +26,32 @@ app.get('/', (req, res) => {
     status: 'running',
     server: 'Express + MSW',
     endpoints: [
-      'GET /api/health',
-      'GET /api/recommendations',
-      'GET /api/recommendations/:id',
-      'GET /api/prevention',
-      'GET /api/prevention/primary',
-      'GET /api/prevention/secondary',
-      'GET /api/longevity'
+      'GET /mock-user',
+      'GET /mock-recommendations'
     ]
   });
 });
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Mock API server is running',
-    timestamp: new Date().toISOString(),
-    server: 'MSW Backend Server'
-  });
-});
-
-// Get all recommendations
-app.get('/api/recommendations', (req, res) => {
-  res.json({
-    success: true,
-    data: mockRecommendations,
-    count: mockRecommendations.length
-  });
-});
-
-// Get single recommendation by ID
-app.get('/api/recommendations/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const recommendation = mockRecommendations.find(rec => rec.id === id);
-  
-  if (!recommendation) {
+// Get mock user data
+app.get('/mock-user', (req, res) => {
+  if (!mockUser) {
     return res.status(404).json({
       success: false,
-      error: 'Recommendation not found'
+      error: 'User data not found'
     });
   }
-  
   res.json({
     success: true,
-    data: recommendation
+    data: mockUser
   });
 });
 
-// Get all prevention data
-app.get('/api/prevention', (req, res) => {
+// Get mock recommendations data
+app.get('/mock-recommendations', (req, res) => {
   res.json({
     success: true,
-    data: mockPreventionData
-  });
-});
-
-// Get primary prevention
-app.get('/api/prevention/primary', (req, res) => {
-  res.json({
-    success: true,
-    data: mockPreventionData.primary,
-    count: mockPreventionData.primary.length
-  });
-});
-
-// Get secondary prevention
-app.get('/api/prevention/secondary', (req, res) => {
-  res.json({
-    success: true,
-    data: mockPreventionData.secondary,
-    count: mockPreventionData.secondary.length
-  });
-});
-
-// Get longevity data
-app.get('/api/longevity', (req, res) => {
-  res.json({
-    success: true,
-    data: mockLongevityData
+    data: mockRecommendationsFromJson || [],
+    count: (mockRecommendationsFromJson || []).length
   });
 });
 
@@ -114,11 +61,6 @@ app.listen(PORT, () => {
   console.log(`📡 MSW is active for fetch/undici requests`);
   console.log(`🌐 Express routes are also available`);
   console.log(`\nAvailable endpoints:`);
-  console.log(`  GET /api/health`);
-  console.log(`  GET /api/recommendations`);
-  console.log(`  GET /api/recommendations/:id`);
-  console.log(`  GET /api/prevention`);
-  console.log(`  GET /api/prevention/primary`);
-  console.log(`  GET /api/prevention/secondary`);
-  console.log(`  GET /api/longevity`);
+  console.log(`  GET /mock-user`);
+  console.log(`  GET /mock-recommendations`);
 });

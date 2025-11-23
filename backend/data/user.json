@@ -1,0 +1,45 @@
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phoneNumber": "+1-555-0123",
+  "dateOfBirth": "1985-05-15",
+  "age": 39,
+  "sex": "male",
+  "existingHealthConditions": [
+    {
+      "id": 1,
+      "name": "Hypertension",
+      "diagnosedDate": "2020-03-10",
+      "severity": "mild",
+      "medications": ["Lisinopril 10mg daily"]
+    },
+    {
+      "id": 2,
+      "name": "Type 2 Diabetes",
+      "diagnosedDate": "2018-07-22",
+      "severity": "moderate",
+      "medications": ["Metformin 500mg twice daily"]
+    }
+  ],
+  "familyHistory": [
+    {
+      "condition": "Heart Disease",
+      "relation": "Father",
+      "ageAtDiagnosis": 58
+    },
+    {
+      "condition": "Diabetes",
+      "relation": "Mother",
+      "ageAtDiagnosis": 62
+    }
+  ],
+  "lifestyle": {
+    "smokingStatus": "never",
+    "alcoholConsumption": "moderate",
+    "exerciseFrequency": "2-3 times per week",
+    "dietType": "mixed"
+  },
+  "lastUpdated": "2024-01-15T10:30:00Z"
+}
+
