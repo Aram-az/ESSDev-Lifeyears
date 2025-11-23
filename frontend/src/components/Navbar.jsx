@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,38 +13,38 @@ function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
-            <a href="/" className="text-xl font-bold text-gray-800">
+            <Link to="/" className="text-xl font-bold text-gray-800">
               ESSDev Lifeyears
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <a
-                href="#home"
+              <Link
+                to="/"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Home
-              </a>
-              <a
-                href="#about"
+              </Link>
+              <Link
+                to="/dashboard-temp"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                About
-              </a>
-              <a
-                href="#services"
+                Dashboard
+              </Link>
+              <Link
+                to="/onboarding-temp"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Services
-              </a>
-              <a
-                href="#contact"
+                Onboarding
+              </Link>
+              <Link
+                to="/profile-temp"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Contact
-              </a>
+                Profile
+              </Link>
             </div>
           </div>
 
@@ -95,34 +96,34 @@ function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
-            <a
-              href="#home"
+            <Link
+              to="/"
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Home
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              to="/dashboard-temp"
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
-              About
-            </a>
-            <a
-              href="#services"
+              Dashboard
+            </Link>
+            <Link
+              to="/onboarding-temp"
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
-              Services
-            </a>
-            <a
-              href="#contact"
+              Onboarding
+            </Link>
+            <Link
+              to="/profile-temp"
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
-              Contact
-            </a>
+              Profile
+            </Link>
           </div>
         </div>
       )}
