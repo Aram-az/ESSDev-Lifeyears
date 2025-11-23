@@ -33,7 +33,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/dashboard-temp"
+                  to="/dashboard-proto"
                   className="text-gray-300 hover:text-white transition-colors block"
                 >
                   Dashboard
