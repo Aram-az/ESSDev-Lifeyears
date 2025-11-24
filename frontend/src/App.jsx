@@ -8,6 +8,7 @@ import OnboardingTemp from './pages/OnboardingTemp.jsx';
 import ProfileTemp from './pages/ProfileTemp.jsx';
 import Demo from './pages/Demo.jsx';
 import DashboardProto from './pages/DashboardProto.jsx'; // new sprint-2 page
+import StyleGuideTemp from './pages/StyleGuideTemp.jsx';
 
 function App() {
   return (
@@ -65,6 +66,16 @@ function App() {
           element={
             <Layout>
               <Demo />
+            </Layout>
+          }
+        />
+
+        {/* UI Component Playground / Style Guide */}
+        <Route
+          path="/styleguide-temp"
+          element={
+            <Layout>
+              <StyleGuideTemp />
             </Layout>
           }
         />
