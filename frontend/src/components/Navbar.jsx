@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const isActive = (path) => {
+    return location.pathname === path;
   };
 
   return (
@@ -23,27 +28,55 @@ function Navbar() {
             <div className="ml-10 flex items-baseline space-x-4">
               <Link
                 to="/"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
+                  isActive("/")
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
               >
                 Home
+                {isActive("/") && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></span>
+                )}
               </Link>
               <Link
                 to="/dashboard"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
+                  isActive("/dashboard")
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
               >
                 Dashboard
+                {isActive("/dashboard") && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></span>
+                )}
               </Link>
               <Link
                 to="/onboarding"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
+                  isActive("/onboarding")
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
               >
                 Onboarding
+                {isActive("/onboarding") && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></span>
+                )}
               </Link>
               <Link
                 to="/profile"
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
+                  isActive("/profile")
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
               >
                 Profile
+                {isActive("/profile") && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></span>
+                )}
               </Link>
             </div>
           </div>
@@ -98,28 +131,44 @@ function Navbar() {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
             <Link
               to="/"
-              className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive("/")
+                  ? "text-blue-600 bg-blue-50 font-semibold border-l-4 border-blue-600"
+                  : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link
               to="/dashboard"
-              className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive("/dashboard")
+                  ? "text-blue-600 bg-blue-50 font-semibold border-l-4 border-blue-600"
+                  : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Dashboard
             </Link>
             <Link
               to="/onboarding"
-              className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive("/onboarding")
+                  ? "text-blue-600 bg-blue-50 font-semibold border-l-4 border-blue-600"
+                  : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Onboarding
             </Link>
             <Link
               to="/profile"
-              className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                isActive("/profile")
+                  ? "text-blue-600 bg-blue-50 font-semibold border-l-4 border-blue-600"
+                  : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Profile
