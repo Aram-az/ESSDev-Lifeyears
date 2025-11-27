@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
 import { useState } from "react";
-=======
-import { Link } from "react-router-dom";
->>>>>>> Stashed changes
 
 function OnboardingTemp() {
   const [step, setStep] = useState(1);
@@ -19,8 +15,8 @@ function OnboardingTemp() {
       smokingStatus: "",
       alcoholConsumption: "",
       exerciseFrequency: "",
-      dietType: ""
-    }
+      dietType: "",
+    },
   });
   const [errors, setErrors] = useState({});
   const [isComplete, setIsComplete] = useState(false);
@@ -119,11 +115,11 @@ function OnboardingTemp() {
       submittedAt: new Date().toISOString(),
       id: Date.now(), // Add unique ID for each user
     };
-    
+
     // Get existing users array or create new one
     const existingData = localStorage.getItem("onboardingData");
     let usersArray = [];
-    
+
     if (existingData) {
       try {
         const parsed = JSON.parse(existingData);
@@ -134,10 +130,10 @@ function OnboardingTemp() {
         usersArray = [];
       }
     }
-    
+
     // Add new user to array
     usersArray.push(userData);
-    
+
     // Save updated array
     localStorage.setItem("onboardingData", JSON.stringify(usersArray));
     setIsComplete(true);
@@ -149,7 +145,10 @@ function OnboardingTemp() {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -250,7 +249,6 @@ function OnboardingTemp() {
   }
 
   return (
-<<<<<<< Updated upstream
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
@@ -267,7 +265,10 @@ function OnboardingTemp() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-lg shadow-md p-6"
+      >
         {/* Step 1: Basic Information */}
         {step === 1 && (
           <div className="space-y-6">
@@ -504,9 +505,15 @@ function OnboardingTemp() {
                   >
                     <option value="">Select...</option>
                     <option value="none">None</option>
-                    <option value="1-2 times per week">1-2 times per week</option>
-                    <option value="2-3 times per week">2-3 times per week</option>
-                    <option value="3-5 times per week">3-5 times per week</option>
+                    <option value="1-2 times per week">
+                      1-2 times per week
+                    </option>
+                    <option value="2-3 times per week">
+                      2-3 times per week
+                    </option>
+                    <option value="3-5 times per week">
+                      3-5 times per week
+                    </option>
                     <option value="daily">Daily</option>
                   </select>
                 </div>
@@ -544,25 +551,35 @@ function OnboardingTemp() {
 
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div>
-                <span className="text-sm font-semibold text-gray-700">Name:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Name:
+                </span>{" "}
                 <span className="text-gray-900">{formData.name}</span>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-700">Email:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Email:
+                </span>{" "}
                 <span className="text-gray-900">{formData.email}</span>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-700">Date of Birth:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Date of Birth:
+                </span>{" "}
                 <span className="text-gray-900">{formData.dateOfBirth}</span>
               </div>
               {formData.phoneNumber && (
                 <div>
-                  <span className="text-sm font-semibold text-gray-700">Phone:</span>{" "}
+                  <span className="text-sm font-semibold text-gray-700">
+                    Phone:
+                  </span>{" "}
                   <span className="text-gray-900">{formData.phoneNumber}</span>
                 </div>
               )}
               <div>
-                <span className="text-sm font-semibold text-gray-700">Sex:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Sex:
+                </span>{" "}
                 <span className="text-gray-900 capitalize">{formData.sex}</span>
               </div>
               {formData.existingHealthConditions.length > 0 && (
@@ -579,8 +596,8 @@ function OnboardingTemp() {
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                Please review your information carefully. You can go back to make
-                changes, or click "Complete Setup" to finish.
+                Please review your information carefully. You can go back to
+                make changes, or click "Complete Setup" to finish.
               </p>
             </div>
           </div>
@@ -619,30 +636,6 @@ function OnboardingTemp() {
         </div>
       </form>
     </div>
-=======
-    <>
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
-        Onboarding (Temporary)
-      </h1>
-      <p className="text-base sm:text-lg text-gray-600 mb-6">
-        This is a temporary onboarding page. Content will be added here.
-      </p>
-      <div className="flex flex-wrap gap-4">
-        <Link
-          to="/onboarding"
-          className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          Go to Normalized Onboarding Route
-        </Link>
-        <Link
-          to="/"
-          className="inline-block px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
-        >
-          Back to Home
-        </Link>
-      </div>
-    </>
->>>>>>> Stashed changes
   );
 }
 

@@ -28,11 +28,7 @@ function Navbar() {
                 Home
               </Link>
               <Link
-<<<<<<< Updated upstream
-                to="/dashboard-proto"
-=======
                 to="/dashboard"
->>>>>>> Stashed changes
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Dashboard
@@ -108,11 +104,7 @@ function Navbar() {
               Home
             </Link>
             <Link
-<<<<<<< Updated upstream
-              to="/dashboard-proto"
-=======
               to="/dashboard"
->>>>>>> Stashed changes
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >

@@ -33,11 +33,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-<<<<<<< Updated upstream
-                  to="/dashboard-proto"
-=======
                   to="/dashboard"
->>>>>>> Stashed changes
                   className="text-gray-300 hover:text-white transition-colors block"
                 >
                   Dashboard
