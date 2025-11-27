@@ -28,19 +28,23 @@ function Navbar() {
                 Home
               </Link>
               <Link
+<<<<<<< Updated upstream
                 to="/dashboard-proto"
+=======
+                to="/dashboard"
+>>>>>>> Stashed changes
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Dashboard
               </Link>
               <Link
-                to="/onboarding-temp"
+                to="/onboarding"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Onboarding
               </Link>
               <Link
-                to="/profile-temp"
+                to="/profile"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Profile
@@ -104,21 +108,25 @@ function Navbar() {
               Home
             </Link>
             <Link
+<<<<<<< Updated upstream
               to="/dashboard-proto"
+=======
+              to="/dashboard"
+>>>>>>> Stashed changes
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Dashboard
             </Link>
             <Link
-              to="/onboarding-temp"
+              to="/onboarding"
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Onboarding
             </Link>
             <Link
-              to="/profile-temp"
+              to="/profile"
               className="text-gray-700 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >

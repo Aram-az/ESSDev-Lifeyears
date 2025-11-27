@@ -13,6 +13,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+<<<<<<< Updated upstream
         {/* Home / Landing – matches what you see on Vercel now */}
         <Route
           path="/"
@@ -68,6 +69,19 @@ function App() {
             </Layout>
           }
         />
+=======
+        {/* Normalized routes */}
+        <Route path="/" element={<Landing />} />
+        <Route path="/onboarding" element={<OnboardingTemp />} />
+        <Route path="/dashboard" element={<DashboardTemp />} />
+        <Route path="/profile" element={<ProfileTemp />} />
+
+        {/* Legacy temp routes (kept for backward compatibility) */}
+        <Route path="/dashboard-temp" element={<DashboardTemp />} />
+        <Route path="/onboarding-temp" element={<OnboardingTemp />} />
+        <Route path="/profile-temp" element={<ProfileTemp />} />
+        <Route path="/demo" element={<Demo />} />
+>>>>>>> Stashed changes
       </Routes>
     </BrowserRouter>
   );
