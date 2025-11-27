@@ -6,6 +6,7 @@ import Landing from "./pages/Landing.jsx";
 import DashboardTemp from "./pages/DashboardTemp.jsx";
 import OnboardingTemp from "./pages/OnboardingTemp.jsx";
 import ProfileTemp from "./pages/ProfileTemp.jsx";
+import Profile from "./pages/Profile.jsx";
 import Demo from "./pages/Demo.jsx";
 import DashboardProto from "./pages/DashboardProto.jsx"; // new sprint-2 page
 
@@ -42,7 +43,7 @@ function App() {
           path="/profile"
           element={
             <Layout>
-              <ProfileTemp />
+              <Profile />
             </Layout>
           }
         />
