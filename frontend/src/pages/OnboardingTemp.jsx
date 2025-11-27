@@ -1,4 +1,6 @@
 import { useState } from "react";
+import PageContainer from "../components/shared/PageContainer";
+import PageHeader from "../components/shared/PageHeader";
 
 function OnboardingTemp() {
   const [step, setStep] = useState(1);
@@ -156,7 +158,7 @@ function OnboardingTemp() {
 
   if (isComplete) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
+      <PageContainer>
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <div className="mb-6">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -244,26 +246,23 @@ function OnboardingTemp() {
             Start Over
           </button>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-          Onboarding
-        </h1>
-        <p className="text-gray-600">
-          Step {step} of 3: Please provide your information to get started
-        </p>
+    <PageContainer>
+      <PageHeader
+        title="Onboarding"
+        description={`Step ${step} of 3: Please provide your information to get started`}
+      >
         <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(step / 3) * 100}%` }}
           ></div>
         </div>
-      </div>
+      </PageHeader>
 
       <form
         onSubmit={handleSubmit}
@@ -635,7 +634,7 @@ function OnboardingTemp() {
           )}
         </div>
       </form>
-    </div>
+    </PageContainer>
   );
 }
 

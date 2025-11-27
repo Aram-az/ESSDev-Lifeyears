@@ -1,63 +1,64 @@
 // src/pages/DashboardProto.jsx
-import { useState, useMemo } from 'react';
+import { useState, useMemo } from "react";
+import PageHeader from "../components/shared/PageHeader";
 
-const TODAY = new Date('2024-11-14');
+const TODAY = new Date("2024-11-14");
 
 const APPOINTMENTS = [
   {
     id: 1,
-    name: 'Annual Physical Exam',
-    confirmationStatus: 'confirmed',
-    status: 'upcoming', // for filters: upcoming | overdue | completed
-    doctor: 'Dr. Sarah Johnson',
-    specialty: 'Primary Care',
-    date: '2024-11-19',
-    time: '10:00 AM',
-    location: 'Main Health Center, Suite 302',
-    phone: '(555) 123-4567',
+    name: "Annual Physical Exam",
+    confirmationStatus: "confirmed",
+    status: "upcoming", // for filters: upcoming | overdue | completed
+    doctor: "Dr. Sarah Johnson",
+    specialty: "Primary Care",
+    date: "2024-11-19",
+    time: "10:00 AM",
+    location: "Main Health Center, Suite 302",
+    phone: "(555) 123-4567",
   },
   {
     id: 2,
-    name: 'Dental Cleaning',
-    confirmationStatus: 'confirmed',
-    status: 'upcoming',
-    doctor: 'Dr. Michael Chen',
-    specialty: 'Dentistry',
-    date: '2024-11-24',
-    time: '2:30 PM',
-    location: 'Smile Dental Care',
-    phone: '(555) 234-5678',
+    name: "Dental Cleaning",
+    confirmationStatus: "confirmed",
+    status: "upcoming",
+    doctor: "Dr. Michael Chen",
+    specialty: "Dentistry",
+    date: "2024-11-24",
+    time: "2:30 PM",
+    location: "Smile Dental Care",
+    phone: "(555) 234-5678",
   },
   {
     id: 3,
-    name: 'Eye Examination',
-    confirmationStatus: 'pending',
-    status: 'upcoming',
-    doctor: 'Dr. Emily Rodriguez',
-    specialty: 'Ophthalmology',
-    date: '2024-12-04',
-    time: '11:00 AM',
-    location: 'Vision Care Associates',
-    phone: '(555) 345-6789',
+    name: "Eye Examination",
+    confirmationStatus: "pending",
+    status: "upcoming",
+    doctor: "Dr. Emily Rodriguez",
+    specialty: "Ophthalmology",
+    date: "2024-12-04",
+    time: "11:00 AM",
+    location: "Vision Care Associates",
+    phone: "(555) 345-6789",
   },
   {
     id: 4,
-    name: 'Dermatology Screening',
-    confirmationStatus: 'confirmed',
-    status: 'completed',
-    doctor: 'Dr. James Park',
-    specialty: 'Dermatology',
-    date: '2024-10-14',
-    time: '9:30 AM',
-    location: 'Skin Health Clinic, Floor 2',
-    phone: '(555) 456-7890',
+    name: "Dermatology Screening",
+    confirmationStatus: "confirmed",
+    status: "completed",
+    doctor: "Dr. James Park",
+    specialty: "Dermatology",
+    date: "2024-10-14",
+    time: "9:30 AM",
+    location: "Skin Health Clinic, Floor 2",
+    phone: "(555) 456-7890",
   },
 ];
 
-const FILTERS = ['all', 'upcoming', 'overdue', 'completed'];
+const FILTERS = ["all", "upcoming", "overdue", "completed"];
 
 function DashboardProto() {
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const stats = useMemo(() => {
     const summary = { upcoming: 0, overdue: 0, completed: 0 };
@@ -65,7 +66,7 @@ function DashboardProto() {
       if (summary[apt.status] !== undefined) summary[apt.status] += 1;
     });
 
-    const upcoming = APPOINTMENTS.filter((a) => a.status === 'upcoming');
+    const upcoming = APPOINTMENTS.filter((a) => a.status === "upcoming");
     let daysUntilNext = null;
 
     if (upcoming.length > 0) {
@@ -79,7 +80,7 @@ function DashboardProto() {
     }
 
     const pendingCount = APPOINTMENTS.filter(
-      (a) => a.confirmationStatus === 'pending',
+      (a) => a.confirmationStatus === "pending"
     ).length;
 
     return {
@@ -91,7 +92,7 @@ function DashboardProto() {
   }, []);
 
   const filteredAppointments = useMemo(() => {
-    if (activeFilter === 'all') return APPOINTMENTS;
+    if (activeFilter === "all") return APPOINTMENTS;
     return APPOINTMENTS.filter((apt) => apt.status === activeFilter);
   }, [activeFilter]);
 
@@ -111,9 +112,7 @@ function DashboardProto() {
       <section className="grid gap-4 md:grid-cols-3">
         <StatCard
           label="Next Appointment"
-          value={
-            stats.daysUntilNext != null ? stats.daysUntilNext : '—'
-          }
+          value={stats.daysUntilNext != null ? stats.daysUntilNext : "—"}
           unit="days"
           icon="calendar"
         />
@@ -153,14 +152,14 @@ function DashboardProto() {
                   type="button"
                   onClick={() => setActiveFilter(filter)}
                   className={[
-                    'px-3 py-1.5 rounded-full text-[11px] sm:text-xs border transition-colors',
+                    "px-3 py-1.5 rounded-full text-[11px] sm:text-xs border transition-colors",
                     activeFilter === filter
-                      ? 'bg-rose-500 text-white border-rose-500'
-                      : 'bg-white text-rose-700 border-rose-200 hover:bg-rose-50',
-                  ].join(' ')}
+                      ? "bg-rose-500 text-white border-rose-500"
+                      : "bg-white text-rose-700 border-rose-200 hover:bg-rose-50",
+                  ].join(" ")}
                 >
-                  {filter === 'all'
-                    ? 'All'
+                  {filter === "all"
+                    ? "All"
                     : filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
@@ -297,8 +296,7 @@ function HighlightDay({ day }) {
 }
 
 function StatCard({ label, value, unit, icon }) {
-  const iconChar =
-    icon === 'calendar' ? '📅' : icon === 'check' ? '✅' : '⚠️';
+  const iconChar = icon === "calendar" ? "📅" : icon === "check" ? "✅" : "⚠️";
 
   return (
     <div className="flex items-center justify-between rounded-3xl border border-rose-200 bg-rose-50/40 px-4 py-4 sm:px-5 sm:py-5">
@@ -307,9 +305,7 @@ function StatCard({ label, value, unit, icon }) {
           {label}
         </p>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-2xl font-semibold text-slate-900">
-            {value}
-          </span>
+          <span className="text-2xl font-semibold text-slate-900">{value}</span>
           <span className="text-xs text-slate-500">{unit}</span>
         </div>
       </div>
@@ -334,12 +330,11 @@ function AppointmentCard({ appointment }) {
   } = appointment;
 
   const confirmationStyles =
-    confirmationStatus === 'confirmed'
-      ? 'bg-rose-500 text-white'
-      : 'bg-rose-100 text-rose-700';
+    confirmationStatus === "confirmed"
+      ? "bg-rose-500 text-white"
+      : "bg-rose-100 text-rose-700";
 
-  const statusLabel =
-    status.charAt(0).toUpperCase() + status.slice(1);
+  const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
     <article className="rounded-2xl border border-rose-200 bg-white p-4 sm:p-5">
@@ -355,15 +350,13 @@ function AppointmentCard({ appointment }) {
         <div className="flex flex-col items-end gap-1">
           <span
             className={[
-              'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium',
+              "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium",
               confirmationStyles,
-            ].join(' ')}
+            ].join(" ")}
           >
             {confirmationStatus}
           </span>
-          <span className="text-[11px] text-slate-400">
-            {statusLabel}
-          </span>
+          <span className="text-[11px] text-slate-400">{statusLabel}</span>
         </div>
       </div>
 

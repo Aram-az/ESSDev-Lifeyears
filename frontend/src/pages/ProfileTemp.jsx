@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
+import PageHeader from "../components/shared/PageHeader";
 
 function ProfileTemp() {
   return (
     <>
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
-        Profile (Temporary)
-      </h1>
-      <p className="text-base sm:text-lg text-gray-600 mb-6">
-        This is a temporary profile page. Content will be added here.
-      </p>
+      <PageHeader
+        title="Profile (Temporary)"
+        description="This is a temporary profile page. Content will be added here."
+      />
       <div className="flex flex-wrap gap-4">
         <Link
           to="/profile"
