@@ -33,7 +33,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/dashboard-proto"
+                  to="/dashboard"
                   className="text-gray-300 hover:text-white transition-colors block"
                 >
                   Dashboard
@@ -41,7 +41,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/onboarding-temp"
+                  to="/onboarding"
                   className="text-gray-300 hover:text-white transition-colors block"
                 >
                   Onboarding
@@ -49,7 +49,7 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/profile-temp"
+                  to="/profile"
                   className="text-gray-300 hover:text-white transition-colors block"
                 >
                   Profile

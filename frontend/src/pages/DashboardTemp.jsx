@@ -1,12 +1,27 @@
+import { Link } from "react-router-dom";
+import PageHeader from "../components/shared/PageHeader";
+
 function DashboardTemp() {
   return (
     <>
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
-        Dashboard (Temporary)
-      </h1>
-      <p className="text-base sm:text-lg text-gray-600">
-        This is a temporary dashboard page. Content will be added here.
-      </p>
+      <PageHeader
+        title="Dashboard (Temporary)"
+        description="This is a temporary dashboard page. Content will be added here."
+      />
+      <div className="flex flex-wrap gap-4">
+        <Link
+          to="/dashboard"
+          className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+        >
+          Go to Real Dashboard
+        </Link>
+        <Link
+          to="/"
+          className="inline-block px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
+        >
+          Back to Home
+        </Link>
+      </div>
     </>
   );
 }

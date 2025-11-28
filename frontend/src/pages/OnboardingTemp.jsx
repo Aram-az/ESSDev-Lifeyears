@@ -1,4 +1,6 @@
 import { useState } from "react";
+import PageContainer from "../components/shared/PageContainer";
+import PageHeader from "../components/shared/PageHeader";
 
 function OnboardingTemp() {
   const [step, setStep] = useState(1);
@@ -15,8 +17,8 @@ function OnboardingTemp() {
       smokingStatus: "",
       alcoholConsumption: "",
       exerciseFrequency: "",
-      dietType: ""
-    }
+      dietType: "",
+    },
   });
   const [errors, setErrors] = useState({});
   const [isComplete, setIsComplete] = useState(false);
@@ -115,11 +117,11 @@ function OnboardingTemp() {
       submittedAt: new Date().toISOString(),
       id: Date.now(), // Add unique ID for each user
     };
-    
+
     // Get existing users array or create new one
     const existingData = localStorage.getItem("onboardingData");
     let usersArray = [];
-    
+
     if (existingData) {
       try {
         const parsed = JSON.parse(existingData);
@@ -130,10 +132,10 @@ function OnboardingTemp() {
         usersArray = [];
       }
     }
-    
+
     // Add new user to array
     usersArray.push(userData);
-    
+
     // Save updated array
     localStorage.setItem("onboardingData", JSON.stringify(usersArray));
     setIsComplete(true);
@@ -145,7 +147,10 @@ function OnboardingTemp() {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -153,7 +158,7 @@ function OnboardingTemp() {
 
   if (isComplete) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
+      <PageContainer>
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <div className="mb-6">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -241,28 +246,28 @@ function OnboardingTemp() {
             Start Over
           </button>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-          Onboarding
-        </h1>
-        <p className="text-gray-600">
-          Step {step} of 3: Please provide your information to get started
-        </p>
+    <PageContainer>
+      <PageHeader
+        title="Onboarding"
+        description={`Step ${step} of 3: Please provide your information to get started`}
+      >
         <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(step / 3) * 100}%` }}
           ></div>
         </div>
-      </div>
+      </PageHeader>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-lg shadow-md p-6"
+      >
         {/* Step 1: Basic Information */}
         {step === 1 && (
           <div className="space-y-6">
@@ -499,9 +504,15 @@ function OnboardingTemp() {
                   >
                     <option value="">Select...</option>
                     <option value="none">None</option>
-                    <option value="1-2 times per week">1-2 times per week</option>
-                    <option value="2-3 times per week">2-3 times per week</option>
-                    <option value="3-5 times per week">3-5 times per week</option>
+                    <option value="1-2 times per week">
+                      1-2 times per week
+                    </option>
+                    <option value="2-3 times per week">
+                      2-3 times per week
+                    </option>
+                    <option value="3-5 times per week">
+                      3-5 times per week
+                    </option>
                     <option value="daily">Daily</option>
                   </select>
                 </div>
@@ -539,25 +550,35 @@ function OnboardingTemp() {
 
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div>
-                <span className="text-sm font-semibold text-gray-700">Name:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Name:
+                </span>{" "}
                 <span className="text-gray-900">{formData.name}</span>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-700">Email:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Email:
+                </span>{" "}
                 <span className="text-gray-900">{formData.email}</span>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-700">Date of Birth:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Date of Birth:
+                </span>{" "}
                 <span className="text-gray-900">{formData.dateOfBirth}</span>
               </div>
               {formData.phoneNumber && (
                 <div>
-                  <span className="text-sm font-semibold text-gray-700">Phone:</span>{" "}
+                  <span className="text-sm font-semibold text-gray-700">
+                    Phone:
+                  </span>{" "}
                   <span className="text-gray-900">{formData.phoneNumber}</span>
                 </div>
               )}
               <div>
-                <span className="text-sm font-semibold text-gray-700">Sex:</span>{" "}
+                <span className="text-sm font-semibold text-gray-700">
+                  Sex:
+                </span>{" "}
                 <span className="text-gray-900 capitalize">{formData.sex}</span>
               </div>
               {formData.existingHealthConditions.length > 0 && (
@@ -574,8 +595,8 @@ function OnboardingTemp() {
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                Please review your information carefully. You can go back to make
-                changes, or click "Complete Setup" to finish.
+                Please review your information carefully. You can go back to
+                make changes, or click "Complete Setup" to finish.
               </p>
             </div>
           </div>
@@ -613,7 +634,7 @@ function OnboardingTemp() {
           )}
         </div>
       </form>
-    </div>
+    </PageContainer>
   );
 }
 

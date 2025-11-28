@@ -1,19 +1,20 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Layout from './components/layout/Layout.jsx';
+import Layout from "./components/layout/Layout.jsx";
 
-import Landing from './pages/Landing.jsx';
-import DashboardTemp from './pages/DashboardTemp.jsx';
-import OnboardingTemp from './pages/OnboardingTemp.jsx';
-import ProfileTemp from './pages/ProfileTemp.jsx';
-import Demo from './pages/Demo.jsx';
-import DashboardProto from './pages/DashboardProto.jsx'; // new sprint-2 page
+import Landing from "./pages/Landing.jsx";
+import DashboardTemp from "./pages/DashboardTemp.jsx";
+import OnboardingTemp from "./pages/OnboardingTemp.jsx";
+import ProfileTemp from "./pages/ProfileTemp.jsx";
+import Profile from "./pages/Profile.jsx";
+import Demo from "./pages/Demo.jsx";
+import DashboardProto from "./pages/DashboardProto.jsx"; // new sprint-2 page
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Home / Landing – matches what you see on Vercel now */}
+        {/* Normalized routes */}
         <Route
           path="/"
           element={
@@ -22,8 +23,32 @@ function App() {
             </Layout>
           }
         />
+        <Route
+          path="/onboarding"
+          element={
+            <Layout>
+              <OnboardingTemp />
+            </Layout>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
+              <DashboardProto />
+            </Layout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Layout>
+              <Profile />
+            </Layout>
+          }
+        />
 
-        {/* Existing temp routes from Sprint 1 */}
+        {/* Legacy temp routes (kept for backward compatibility) */}
         <Route
           path="/dashboard-temp"
           element={
@@ -49,7 +74,7 @@ function App() {
           }
         />
 
-        {/* Dev 3 – Dashboard prototype */}
+        {/* Dashboard prototype route */}
         <Route
           path="/dashboard-proto"
           element={

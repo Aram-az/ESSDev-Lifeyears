@@ -1,10 +1,20 @@
 ## Current frontend routing:
 
-1. "/" ==> routes to .src/pages/Landing.jsx (landing page)
-2. "/dashboard-temp" ==> routes to .src/pages/DashboardTemp.jsx (temporary dashboard page)
-3. "/onboarding-temp" ==> routes to ./src/pages/OnboardingTemp.jsx (temporary onboarding page)
-4. "/profile-temp" ==> routes to ./src/pages/ProfileTemp.jsx (temporary profile page)
-5. "/demo" ==> routes to the ./src/pages/Demo.jsx (api demo page)
+### Normalized Routes (Primary)
+
+1. "/" ==> routes to ./src/pages/Landing.jsx (landing page / home)
+2. "/onboarding" ==> routes to ./src/pages/OnboardingTemp.jsx (onboarding page)
+3. "/dashboard" ==> routes to ./src/pages/DashboardTemp.jsx (dashboard page)
+4. "/profile" ==> routes to ./src/pages/ProfileTemp.jsx (profile page)
+
+### Legacy Routes (Kept for backward compatibility)
+
+5. "/dashboard-temp" ==> routes to ./src/pages/DashboardTemp.jsx (temporary dashboard page)
+6. "/onboarding-temp" ==> routes to ./src/pages/OnboardingTemp.jsx (temporary onboarding page)
+7. "/profile-temp" ==> routes to ./src/pages/ProfileTemp.jsx (temporary profile page)
+8. "/demo" ==> routes to ./src/pages/Demo.jsx (api demo page)
+
+**Note:** The legacy temp routes are kept temporarily but include navigation buttons to reach the normalized routes. The Navbar and Footer use the normalized routes.
 
 ## How to add a new page
 
