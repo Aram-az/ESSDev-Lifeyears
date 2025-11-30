@@ -1,6 +1,12 @@
 import { useState } from "react";
 import PageContainer from "../components/shared/PageContainer";
-import PageHeader from "../components/shared/PageHeader";
+import PageTitle from "../components/ui/PageTitle";
+import SectionTitle from "../components/ui/SectionTitle";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Select from "../components/ui/Select";
+import Card from "../components/ui/Card";
+import Badge from "../components/ui/Badge";
 
 function OnboardingTemp() {
   const [step, setStep] = useState(1);
@@ -159,7 +165,7 @@ function OnboardingTemp() {
   if (isComplete) {
     return (
       <PageContainer>
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+        <Card className="text-center p-8">
           <div className="mb-6">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <svg
@@ -176,9 +182,7 @@ function OnboardingTemp() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Setup Complete!
-            </h1>
+            <PageTitle className="mb-2">Setup Complete!</PageTitle>
             <p className="text-gray-600 mb-6">
               Your onboarding information has been saved successfully.
             </p>
@@ -220,7 +224,7 @@ function OnboardingTemp() {
               )}
             </div>
           </div>
-          <button
+          <Button
             onClick={() => {
               setIsComplete(false);
               setStep(1);
@@ -241,399 +245,310 @@ function OnboardingTemp() {
                 },
               });
             }}
-            className="btn-primary"
+            variant="primary"
           >
             Start Over
-          </button>
-        </div>
+          </Button>
+        </Card>
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Onboarding"
+      <PageTitle
         description={`Step ${step} of 3: Please provide your information to get started`}
       >
-        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(step / 3) * 100}%` }}
-          ></div>
-        </div>
-      </PageHeader>
+        Onboarding
+      </PageTitle>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-lg shadow-md p-6"
-      >
-        {/* Step 1: Basic Information */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Basic Information
-            </h2>
+      <div className="mt-4 mb-6 w-full bg-gray-200 rounded-full h-2">
+        <div
+          className="bg-brand-600 h-2 rounded-full transition-all duration-300"
+          style={{ width: `${(step / 3) * 100}%` }}
+        ></div>
+      </div>
 
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
+      <Card>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Step 1: Basic Information */}
+          {step === 1 && (
+            <div className="space-y-6">
+              <SectionTitle>Basic Information</SectionTitle>
+
+              <Input
+                label="Full Name"
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.name ? "border-red-500" : "border-gray-300"
-                }`}
+                error={errors.name}
                 placeholder="Enter your full name"
+                required
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-              )}
-            </div>
 
-            <div>
-              <label
-                htmlFor="dateOfBirth"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Date of Birth <span className="text-red-500">*</span>
-              </label>
-              <input
+              <Input
+                label="Date of Birth"
                 type="date"
                 id="dateOfBirth"
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleInputChange}
                 max={new Date().toISOString().split("T")[0]}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.dateOfBirth ? "border-red-500" : "border-gray-300"
-                }`}
+                error={errors.dateOfBirth}
+                required
               />
-              {errors.dateOfBirth && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.dateOfBirth}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email Address <span className="text-red-500">*</span>
-              </label>
-              <input
+              <Input
+                label="Email Address"
                 type="email"
                 id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                }`}
+                error={errors.email}
                 placeholder="your.email@example.com"
+                required
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-              )}
-            </div>
 
-            <div>
-              <label
-                htmlFor="phoneNumber"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Phone Number <span className="text-gray-500">(Optional)</span>
-              </label>
-              <input
+              <Input
+                label="Phone Number (Optional)"
                 type="tel"
                 id="phoneNumber"
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="+1-555-0123"
               />
-            </div>
 
-            <div>
-              <label
-                htmlFor="sex"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Sex <span className="text-red-500">*</span>
-              </label>
-              <select
+              <Select
+                label="Sex"
                 id="sex"
                 name="sex"
                 value={formData.sex}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.sex ? "border-red-500" : "border-gray-300"
-                }`}
-              >
-                <option value="">Select...</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-                <option value="prefer-not-to-say">Prefer not to say</option>
-              </select>
-              {errors.sex && (
-                <p className="mt-1 text-sm text-red-600">{errors.sex}</p>
-              )}
+                error={errors.sex}
+                required
+                options={[
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "other", label: "Other" },
+                  { value: "prefer-not-to-say", label: "Prefer not to say" },
+                ]}
+              />
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Step 2: Health Conditions */}
-        {step === 2 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Health Information
-            </h2>
+          {/* Step 2: Health Conditions */}
+          {step === 2 && (
+            <div className="space-y-6">
+              <SectionTitle>Health Information</SectionTitle>
 
-            <div>
-              <label
-                htmlFor="currentCondition"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Existing Health Conditions
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  id="currentCondition"
-                  name="currentCondition"
-                  value={formData.currentCondition}
-                  onChange={handleInputChange}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addHealthCondition();
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter a health condition (e.g., Hypertension)"
-                />
-                <button
-                  type="button"
-                  onClick={addHealthCondition}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
+              <div>
+                <label
+                  htmlFor="currentCondition"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Add
-                </button>
-              </div>
-              {formData.existingHealthConditions.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {formData.existingHealthConditions.map((condition, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                    >
-                      {condition}
-                      <button
-                        type="button"
-                        onClick={() => removeHealthCondition(index)}
-                        className="ml-2 text-blue-600 hover:text-blue-800"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
+                  Existing Health Conditions
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    id="currentCondition"
+                    name="currentCondition"
+                    value={formData.currentCondition}
+                    onChange={handleInputChange}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addHealthCondition();
+                      }
+                    }}
+                    placeholder="Enter a health condition (e.g., Hypertension)"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addHealthCondition}
+                    variant="primary"
+                  >
+                    Add
+                  </Button>
                 </div>
-              )}
-            </div>
+                {formData.existingHealthConditions.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {formData.existingHealthConditions.map(
+                      (condition, index) => (
+                        <Badge
+                          key={index}
+                          variant="pending"
+                          className="bg-brand-100 text-brand-800"
+                        >
+                          {condition}
+                          <button
+                            type="button"
+                            onClick={() => removeHealthCondition(index)}
+                            className="ml-2 text-brand-600 hover:text-brand-800 font-bold"
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Lifestyle Information
-              </label>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Smoking Status
-                  </label>
-                  <select
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Lifestyle Information
+                </label>
+                <div className="space-y-4">
+                  <Select
+                    label="Smoking Status"
                     name="lifestyle.smokingStatus"
                     value={formData.lifestyle.smokingStatus}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select...</option>
-                    <option value="never">Never smoked</option>
-                    <option value="former">Former smoker</option>
-                    <option value="current">Current smoker</option>
-                  </select>
-                </div>
+                    options={[
+                      { value: "never", label: "Never smoked" },
+                      { value: "former", label: "Former smoker" },
+                      { value: "current", label: "Current smoker" },
+                    ]}
+                  />
 
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Alcohol Consumption
-                  </label>
-                  <select
+                  <Select
+                    label="Alcohol Consumption"
                     name="lifestyle.alcoholConsumption"
                     value={formData.lifestyle.alcoholConsumption}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select...</option>
-                    <option value="none">None</option>
-                    <option value="occasional">Occasional</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="heavy">Heavy</option>
-                  </select>
-                </div>
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "occasional", label: "Occasional" },
+                      { value: "moderate", label: "Moderate" },
+                      { value: "heavy", label: "Heavy" },
+                    ]}
+                  />
 
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Exercise Frequency
-                  </label>
-                  <select
+                  <Select
+                    label="Exercise Frequency"
                     name="lifestyle.exerciseFrequency"
                     value={formData.lifestyle.exerciseFrequency}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select...</option>
-                    <option value="none">None</option>
-                    <option value="1-2 times per week">
-                      1-2 times per week
-                    </option>
-                    <option value="2-3 times per week">
-                      2-3 times per week
-                    </option>
-                    <option value="3-5 times per week">
-                      3-5 times per week
-                    </option>
-                    <option value="daily">Daily</option>
-                  </select>
-                </div>
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "1-2 times per week", label: "1-2 times per week" },
+                      { value: "2-3 times per week", label: "2-3 times per week" },
+                      { value: "3-5 times per week", label: "3-5 times per week" },
+                      { value: "daily", label: "Daily" },
+                    ]}
+                  />
 
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Diet Type
-                  </label>
-                  <select
+                  <Select
+                    label="Diet Type"
                     name="lifestyle.dietType"
                     value={formData.lifestyle.dietType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select...</option>
-                    <option value="mixed">Mixed</option>
-                    <option value="vegetarian">Vegetarian</option>
-                    <option value="vegan">Vegan</option>
-                    <option value="mediterranean">Mediterranean</option>
-                    <option value="keto">Keto</option>
-                    <option value="other">Other</option>
-                  </select>
+                    options={[
+                      { value: "mixed", label: "Mixed" },
+                      { value: "vegetarian", label: "Vegetarian" },
+                      { value: "vegan", label: "Vegan" },
+                      { value: "mediterranean", label: "Mediterranean" },
+                      { value: "keto", label: "Keto" },
+                      { value: "other", label: "Other" },
+                    ]}
+                  />
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Step 3: Review */}
-        {step === 3 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Review Your Information
-            </h2>
+          {/* Step 3: Review */}
+          {step === 3 && (
+            <div className="space-y-6">
+              <SectionTitle>Review Your Information</SectionTitle>
 
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-              <div>
-                <span className="text-sm font-semibold text-gray-700">
-                  Name:
-                </span>{" "}
-                <span className="text-gray-900">{formData.name}</span>
-              </div>
-              <div>
-                <span className="text-sm font-semibold text-gray-700">
-                  Email:
-                </span>{" "}
-                <span className="text-gray-900">{formData.email}</span>
-              </div>
-              <div>
-                <span className="text-sm font-semibold text-gray-700">
-                  Date of Birth:
-                </span>{" "}
-                <span className="text-gray-900">{formData.dateOfBirth}</span>
-              </div>
-              {formData.phoneNumber && (
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <div>
                   <span className="text-sm font-semibold text-gray-700">
-                    Phone:
+                    Name:
                   </span>{" "}
-                  <span className="text-gray-900">{formData.phoneNumber}</span>
+                  <span className="text-gray-900">{formData.name}</span>
                 </div>
-              )}
-              <div>
-                <span className="text-sm font-semibold text-gray-700">
-                  Sex:
-                </span>{" "}
-                <span className="text-gray-900 capitalize">{formData.sex}</span>
-              </div>
-              {formData.existingHealthConditions.length > 0 && (
                 <div>
                   <span className="text-sm font-semibold text-gray-700">
-                    Health Conditions:
+                    Email:
                   </span>{" "}
-                  <span className="text-gray-900">
-                    {formData.existingHealthConditions.join(", ")}
+                  <span className="text-gray-900">{formData.email}</span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Date of Birth:
+                  </span>{" "}
+                  <span className="text-gray-900">{formData.dateOfBirth}</span>
+                </div>
+                {formData.phoneNumber && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Phone:
+                    </span>{" "}
+                    <span className="text-gray-900">
+                      {formData.phoneNumber}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Sex:
+                  </span>{" "}
+                  <span className="text-gray-900 capitalize">
+                    {formData.sex}
                   </span>
                 </div>
-              )}
-            </div>
+                {formData.existingHealthConditions.length > 0 && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Health Conditions:
+                    </span>{" "}
+                    <span className="text-gray-900">
+                      {formData.existingHealthConditions.join(", ")}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                Please review your information carefully. You can go back to
-                make changes, or click "Complete Setup" to finish.
-              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  Please review your information carefully. You can go back to
+                  make changes, or click "Complete Setup" to finish.
+                </p>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="mt-8 flex justify-between">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={step === 1}
-            className={`px-6 py-2 rounded-lg font-medium ${
-              step === 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            Back
-          </button>
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              type="submit"
-              className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500"
-            >
-              Complete Setup
-            </button>
           )}
-        </div>
-      </form>
+
+          {/* Navigation Buttons */}
+          <div className="mt-8 flex justify-between">
+            <Button
+              type="button"
+              onClick={handleBack}
+              disabled={step === 1}
+              variant="secondary"
+              className={step === 1 ? "cursor-not-allowed opacity-50" : ""}
+            >
+              Back
+            </Button>
+            {step < 3 ? (
+              <Button type="button" onClick={handleNext} variant="primary">
+                Next
+              </Button>
+            ) : (
+              <Button type="submit" variant="primary" className="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+                Complete Setup
+              </Button>
+            )}
+          </div>
+        </form>
+      </Card>
     </PageContainer>
   );
 }

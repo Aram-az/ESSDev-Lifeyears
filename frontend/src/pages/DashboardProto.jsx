@@ -1,6 +1,10 @@
 // src/pages/DashboardProto.jsx
 import { useState, useMemo } from "react";
-import PageHeader from "../components/shared/PageHeader";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Badge from "../components/ui/Badge";
+import PageTitle from "../components/ui/PageTitle";
+import SectionTitle from "../components/ui/SectionTitle";
 
 const TODAY = new Date("2024-11-14");
 
@@ -99,14 +103,11 @@ function DashboardProto() {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <header className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
-          Dashboard
-        </h1>
-        <p className="text-sm sm:text-base text-slate-500 max-w-xl">
-          Track your preventative health appointments and screenings.
-        </p>
-      </header>
+      <PageTitle
+        description="Track your preventative health appointments and screenings."
+      >
+        Dashboard
+      </PageTitle>
 
       {/* Top stats row */}
       <section className="grid gap-4 md:grid-cols-3">
@@ -133,40 +134,38 @@ function DashboardProto() {
       {/* Main content: Upcoming list + Calendar */}
       <section className="grid gap-6 lg:grid-cols-[minmax(0,2.2fr),minmax(0,1.3fr)]">
         {/* Upcoming appointments column */}
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-5 sm:p-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                Upcoming Appointments
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500">
-                Your scheduled preventative health visits.
-              </p>
-            </div>
+        <Card className="bg-rose-50/40 border-rose-200">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <SectionTitle
+              description="Your scheduled preventative health visits."
+              className="mb-0"
+            >
+              Upcoming Appointments
+            </SectionTitle>
 
             {/* Filter chips */}
             <div className="mt-3 inline-flex flex-wrap gap-2 sm:mt-0">
               {FILTERS.map((filter) => (
-                <button
+                <Button
                   key={filter}
-                  type="button"
+                  variant={activeFilter === filter ? "primary" : "outline"}
+                  size="sm"
                   onClick={() => setActiveFilter(filter)}
-                  className={[
-                    "px-3 py-1.5 rounded-full text-[11px] sm:text-xs border transition-colors",
+                  className={
                     activeFilter === filter
-                      ? "bg-rose-500 text-white border-rose-500"
-                      : "bg-white text-rose-700 border-rose-200 hover:bg-rose-50",
-                  ].join(" ")}
+                      ? "bg-rose-500 border-rose-500 hover:bg-rose-600"
+                      : "text-rose-700 border-rose-200 hover:bg-rose-50 hover:text-rose-800"
+                  }
                 >
                   {filter === "all"
                     ? "All"
                     : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
-          <div className="mt-4 space-y-4">
+          <div className="space-y-4">
             {filteredAppointments.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-rose-200 bg-rose-50 px-4 py-8 text-center text-sm text-rose-500">
                 No appointments for this filter.
@@ -178,43 +177,43 @@ function DashboardProto() {
             )}
           </div>
 
-          <button
-            type="button"
-            className="mt-5 w-full rounded-xl bg-rose-500 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-rose-600"
+          <Button
+            variant="primary"
+            className="mt-5 w-full bg-rose-500 hover:bg-rose-600 text-white shadow-sm"
           >
             Schedule New Appointment
-          </button>
-        </div>
+          </Button>
+        </Card>
 
         {/* Calendar column */}
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-5 sm:p-6 flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                Appointment Calendar
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500">
-                November 2024 (static prototype)
-              </p>
-            </div>
+        <Card className="bg-rose-50/40 border-rose-200 flex flex-col h-fit">
+          <div className="flex items-center justify-between mb-4">
+            <SectionTitle
+              description="November 2024 (static prototype)"
+              className="mb-0"
+            >
+              Appointment Calendar
+            </SectionTitle>
             <div className="flex gap-2">
-              <button
-                type="button"
-                className="rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs px-3 py-1 text-rose-700 border-rose-200 hover:bg-rose-50"
               >
                 Previous
-              </button>
-              <button
-                type="button"
-                className="rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs px-3 py-1 text-rose-700 border-rose-200 hover:bg-rose-50"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Very simple static calendar grid */}
-          <div className="mt-4 text-xs text-slate-600">
+          <div className="text-xs text-slate-600">
             <div className="grid grid-cols-7 gap-1 text-center font-medium mb-2">
               <span>Sun</span>
               <span>Mon</span>
@@ -272,7 +271,7 @@ function DashboardProto() {
             <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
             <span>Appointment scheduled</span>
           </div>
-        </div>
+        </Card>
       </section>
     </div>
   );
@@ -299,7 +298,7 @@ function StatCard({ label, value, unit, icon }) {
   const iconChar = icon === "calendar" ? "📅" : icon === "check" ? "✅" : "⚠️";
 
   return (
-    <div className="flex items-center justify-between rounded-3xl border border-rose-200 bg-rose-50/40 px-4 py-4 sm:px-5 sm:py-5">
+    <Card className="flex items-center justify-between bg-rose-50/40 border-rose-200 px-4 py-4 sm:px-5 sm:py-5">
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-rose-500">
           {label}
@@ -312,7 +311,7 @@ function StatCard({ label, value, unit, icon }) {
       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-lg">
         {iconChar}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -329,15 +328,10 @@ function AppointmentCard({ appointment }) {
     phone,
   } = appointment;
 
-  const confirmationStyles =
-    confirmationStatus === "confirmed"
-      ? "bg-rose-500 text-white"
-      : "bg-rose-100 text-rose-700";
-
   const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
-    <article className="rounded-2xl border border-rose-200 bg-white p-4 sm:p-5">
+    <Card className="border-rose-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm sm:text-base font-semibold text-slate-900">
@@ -348,14 +342,18 @@ function AppointmentCard({ appointment }) {
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span
-            className={[
-              "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium",
-              confirmationStyles,
-            ].join(" ")}
+          <Badge
+            variant={
+              confirmationStatus === "confirmed" ? "confirmed" : "pending"
+            }
+            className={
+              confirmationStatus === "confirmed"
+                ? "bg-rose-500 text-white"
+                : "bg-rose-100 text-rose-700"
+            }
           >
             {confirmationStatus}
-          </span>
+          </Badge>
           <span className="text-[11px] text-slate-400">{statusLabel}</span>
         </div>
       </div>
@@ -379,20 +377,22 @@ function AppointmentCard({ appointment }) {
       </div>
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <button
-          type="button"
-          className="w-full rounded-full border border-rose-300 bg-white px-4 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50 sm:w-auto"
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full sm:w-auto text-xs border-rose-300 text-rose-700 hover:bg-rose-50"
         >
           Reschedule
-        </button>
-        <button
-          type="button"
-          className="w-full rounded-full border border-rose-300 bg-white px-4 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50 sm:w-auto"
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full sm:w-auto text-xs border-rose-300 text-rose-700 hover:bg-rose-50"
         >
           Cancel
-        </button>
+        </Button>
       </div>
-    </article>
+    </Card>
   );
 }
 

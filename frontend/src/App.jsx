@@ -9,6 +9,7 @@ import ProfileTemp from "./pages/ProfileTemp.jsx";
 import Profile from "./pages/Profile.jsx";
 import Demo from "./pages/Demo.jsx";
 import DashboardProto from "./pages/DashboardProto.jsx"; // new sprint-2 page
+import StyleguideTemp from "./pages/StyleguideTemp.jsx";
 
 function App() {
   return (
@@ -90,6 +91,16 @@ function App() {
           element={
             <Layout>
               <Demo />
+            </Layout>
+          }
+        />
+
+        {/* Design system playground */}
+        <Route
+          path="/styleguide-temp"
+          element={
+            <Layout>
+              <StyleguideTemp />
             </Layout>
           }
         />
