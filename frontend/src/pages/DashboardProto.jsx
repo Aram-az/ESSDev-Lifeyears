@@ -1,76 +1,77 @@
 // src/pages/DashboardProto.jsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import PageTitle from "../components/ui/PageTitle";
 import SectionTitle from "../components/ui/SectionTitle";
+import { getMockRecommendations, getMockUser } from "../api";
 
 const TODAY = new Date("2024-11-14");
-
-const APPOINTMENTS = [
-  {
-    id: 1,
-    name: "Annual Physical Exam",
-    confirmationStatus: "confirmed",
-    status: "upcoming", // for filters: upcoming | overdue | completed
-    doctor: "Dr. Sarah Johnson",
-    specialty: "Primary Care",
-    date: "2024-11-19",
-    time: "10:00 AM",
-    location: "Main Health Center, Suite 302",
-    phone: "(555) 123-4567",
-  },
-  {
-    id: 2,
-    name: "Dental Cleaning",
-    confirmationStatus: "confirmed",
-    status: "upcoming",
-    doctor: "Dr. Michael Chen",
-    specialty: "Dentistry",
-    date: "2024-11-24",
-    time: "2:30 PM",
-    location: "Smile Dental Care",
-    phone: "(555) 234-5678",
-  },
-  {
-    id: 3,
-    name: "Eye Examination",
-    confirmationStatus: "pending",
-    status: "upcoming",
-    doctor: "Dr. Emily Rodriguez",
-    specialty: "Ophthalmology",
-    date: "2024-12-04",
-    time: "11:00 AM",
-    location: "Vision Care Associates",
-    phone: "(555) 345-6789",
-  },
-  {
-    id: 4,
-    name: "Dermatology Screening",
-    confirmationStatus: "confirmed",
-    status: "completed",
-    doctor: "Dr. James Park",
-    specialty: "Dermatology",
-    date: "2024-10-14",
-    time: "9:30 AM",
-    location: "Skin Health Clinic, Floor 2",
-    phone: "(555) 456-7890",
-  },
-];
-
 const FILTERS = ["all", "upcoming", "overdue", "completed"];
 
 function DashboardProto() {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [appointments, setAppointments] = useState([]);
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setStatus("loading");
+        setError(null);
+
+        const [userRes, recs] = await Promise.all([
+          getMockUser(),
+          getMockRecommendations(),
+        ]);
+        console.log("Mock API /mock-user:", userRes);
+        console.log("Mock API /mock-recommendations:", recs);
+
+        setUser(userRes);
+
+        const list = Array.isArray(recs)
+          ? recs
+          : recs.recommendations || recs.data || [];
+
+        if (!Array.isArray(list)) {
+          throw new Error("Unexpected mock API response shape");
+        }
+
+        const mapped = list.map((rec, idx) => ({
+          id: rec.id ?? idx,
+          name: rec.title ?? "Health appointment",
+          confirmationStatus: rec.confirmationStatus ?? "confirmed",
+          status: rec.status ?? "upcoming", // upcoming | overdue | completed
+          doctor: rec.doctor ?? "Provider",
+          specialty: rec.specialty ?? "General",
+          date: rec.date ?? rec.nextDate ?? "2024-11-19",
+          time: rec.time ?? "10:00 AM",
+          location: rec.location ?? "Clinic",
+          phone: rec.phone ?? "(555) 000-0000",
+        }));
+
+        setAppointments(mapped);
+        setStatus("success");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load your appointments.");
+        setStatus("error");
+      }
+    }
+
+    load();
+  }, []);
 
   const stats = useMemo(() => {
     const summary = { upcoming: 0, overdue: 0, completed: 0 };
-    APPOINTMENTS.forEach((apt) => {
+    appointments.forEach((apt) => {
       if (summary[apt.status] !== undefined) summary[apt.status] += 1;
     });
 
-    const upcoming = APPOINTMENTS.filter((a) => a.status === "upcoming");
+    const upcoming = appointments.filter((a) => a.status === "upcoming");
     let daysUntilNext = null;
 
     if (upcoming.length > 0) {
@@ -83,30 +84,78 @@ function DashboardProto() {
       daysUntilNext = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
     }
 
-    const pendingCount = APPOINTMENTS.filter(
+    const pendingCount = appointments.filter(
       (a) => a.confirmationStatus === "pending"
     ).length;
 
     return {
       daysUntilNext,
-      totalScheduled: APPOINTMENTS.length,
+      totalScheduled: appointments.length,
       pendingConfirmations: pendingCount,
       ...summary,
     };
-  }, []);
+  }, [appointments]);
 
   const filteredAppointments = useMemo(() => {
-    if (activeFilter === "all") return APPOINTMENTS;
-    return APPOINTMENTS.filter((apt) => apt.status === activeFilter);
-  }, [activeFilter]);
+    if (activeFilter === "all") return appointments;
+    return appointments.filter((apt) => apt.status === activeFilter);
+  }, [activeFilter, appointments]);
 
+  // Loading state
+  if (status === "loading") {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            {user?.name ? `Hi, ${user.name}` : "Dashboard"}
+          </h1>
+          <p className="text-sm sm:text-base text-slate-500 max-w-xl">
+            Track your preventative health appointments and screenings.
+          </p>
+        </header>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-sm text-slate-500">
+            Loading your appointments…
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (status === "error") {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            {user?.name ? `Hi, ${user.name}` : "Dashboard"}
+          </h1>
+          <p className="text-sm sm:text-base text-slate-500 max-w-xl">
+            Track your preventative health appointments and screenings.
+          </p>
+        </header>
+        <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error ?? "Something went wrong loading your dashboard."}
+        </div>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center rounded-full border border-rose-300 bg-white px-4 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // Normal render (success / empty handled inside)
   return (
     <div className="space-y-6">
       {/* Page header */}
       <PageTitle
         description="Track your preventative health appointments and screenings."
       >
-        Dashboard
+        {user?.name ? `Hi, ${user.name}` : "Dashboard"}
       </PageTitle>
 
       {/* Top stats row */}
