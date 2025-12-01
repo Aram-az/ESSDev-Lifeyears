@@ -1,72 +1,77 @@
 // src/pages/DashboardProto.jsx
-import { useState, useMemo } from "react";
-import PageHeader from "../components/shared/PageHeader";
+import { useState, useMemo, useEffect } from "react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Badge from "../components/ui/Badge";
+import PageTitle from "../components/ui/PageTitle";
+import SectionTitle from "../components/ui/SectionTitle";
+import { getMockRecommendations, getMockUser } from "../api";
 
 const TODAY = new Date("2024-11-14");
-
-const APPOINTMENTS = [
-  {
-    id: 1,
-    name: "Annual Physical Exam",
-    confirmationStatus: "confirmed",
-    status: "upcoming", // for filters: upcoming | overdue | completed
-    doctor: "Dr. Sarah Johnson",
-    specialty: "Primary Care",
-    date: "2024-11-19",
-    time: "10:00 AM",
-    location: "Main Health Center, Suite 302",
-    phone: "(555) 123-4567",
-  },
-  {
-    id: 2,
-    name: "Dental Cleaning",
-    confirmationStatus: "confirmed",
-    status: "upcoming",
-    doctor: "Dr. Michael Chen",
-    specialty: "Dentistry",
-    date: "2024-11-24",
-    time: "2:30 PM",
-    location: "Smile Dental Care",
-    phone: "(555) 234-5678",
-  },
-  {
-    id: 3,
-    name: "Eye Examination",
-    confirmationStatus: "pending",
-    status: "upcoming",
-    doctor: "Dr. Emily Rodriguez",
-    specialty: "Ophthalmology",
-    date: "2024-12-04",
-    time: "11:00 AM",
-    location: "Vision Care Associates",
-    phone: "(555) 345-6789",
-  },
-  {
-    id: 4,
-    name: "Dermatology Screening",
-    confirmationStatus: "confirmed",
-    status: "completed",
-    doctor: "Dr. James Park",
-    specialty: "Dermatology",
-    date: "2024-10-14",
-    time: "9:30 AM",
-    location: "Skin Health Clinic, Floor 2",
-    phone: "(555) 456-7890",
-  },
-];
-
 const FILTERS = ["all", "upcoming", "overdue", "completed"];
 
 function DashboardProto() {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [appointments, setAppointments] = useState([]);
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setStatus("loading");
+        setError(null);
+
+        const [userRes, recs] = await Promise.all([
+          getMockUser(),
+          getMockRecommendations(),
+        ]);
+        console.log("Mock API /mock-user:", userRes);
+        console.log("Mock API /mock-recommendations:", recs);
+
+        setUser(userRes);
+
+        const list = Array.isArray(recs)
+          ? recs
+          : recs.recommendations || recs.data || [];
+
+        if (!Array.isArray(list)) {
+          throw new Error("Unexpected mock API response shape");
+        }
+
+        const mapped = list.map((rec, idx) => ({
+          id: rec.id ?? idx,
+          name: rec.title ?? "Health appointment",
+          confirmationStatus: rec.confirmationStatus ?? "confirmed",
+          status: rec.status ?? "upcoming", // upcoming | overdue | completed
+          doctor: rec.doctor ?? "Provider",
+          specialty: rec.specialty ?? "General",
+          date: rec.date ?? rec.nextDate ?? "2024-11-19",
+          time: rec.time ?? "10:00 AM",
+          location: rec.location ?? "Clinic",
+          phone: rec.phone ?? "(555) 000-0000",
+        }));
+
+        setAppointments(mapped);
+        setStatus("success");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load your appointments.");
+        setStatus("error");
+      }
+    }
+
+    load();
+  }, []);
 
   const stats = useMemo(() => {
     const summary = { upcoming: 0, overdue: 0, completed: 0 };
-    APPOINTMENTS.forEach((apt) => {
+    appointments.forEach((apt) => {
       if (summary[apt.status] !== undefined) summary[apt.status] += 1;
     });
 
-    const upcoming = APPOINTMENTS.filter((a) => a.status === "upcoming");
+    const upcoming = appointments.filter((a) => a.status === "upcoming");
     let daysUntilNext = null;
 
     if (upcoming.length > 0) {
@@ -79,34 +84,79 @@ function DashboardProto() {
       daysUntilNext = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
     }
 
-    const pendingCount = APPOINTMENTS.filter(
+    const pendingCount = appointments.filter(
       (a) => a.confirmationStatus === "pending"
     ).length;
 
     return {
       daysUntilNext,
-      totalScheduled: APPOINTMENTS.length,
+      totalScheduled: appointments.length,
       pendingConfirmations: pendingCount,
       ...summary,
     };
-  }, []);
+  }, [appointments]);
 
   const filteredAppointments = useMemo(() => {
-    if (activeFilter === "all") return APPOINTMENTS;
-    return APPOINTMENTS.filter((apt) => apt.status === activeFilter);
-  }, [activeFilter]);
+    if (activeFilter === "all") return appointments;
+    return appointments.filter((apt) => apt.status === activeFilter);
+  }, [activeFilter, appointments]);
 
+  // Loading state
+  if (status === "loading") {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            {user?.name ? `Hi, ${user.name}` : "Dashboard"}
+          </h1>
+          <p className="text-sm sm:text-base text-slate-500 max-w-xl">
+            Track your preventative health appointments and screenings.
+          </p>
+        </header>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-sm text-slate-500">
+            Loading your appointments…
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (status === "error") {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            {user?.name ? `Hi, ${user.name}` : "Dashboard"}
+          </h1>
+          <p className="text-sm sm:text-base text-slate-500 max-w-xl">
+            Track your preventative health appointments and screenings.
+          </p>
+        </header>
+        <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error ?? "Something went wrong loading your dashboard."}
+        </div>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center rounded-full border border-rose-300 bg-white px-4 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // Normal render (success / empty handled inside)
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <header className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
-          Dashboard
-        </h1>
-        <p className="text-sm sm:text-base text-slate-500 max-w-xl">
-          Track your preventative health appointments and screenings.
-        </p>
-      </header>
+      <PageTitle
+        description="Track your preventative health appointments and screenings."
+      >
+        {user?.name ? `Hi, ${user.name}` : "Dashboard"}
+      </PageTitle>
 
       {/* Top stats row */}
       <section className="grid gap-4 md:grid-cols-3">
@@ -133,40 +183,38 @@ function DashboardProto() {
       {/* Main content: Upcoming list + Calendar */}
       <section className="grid gap-6 lg:grid-cols-[minmax(0,2.2fr),minmax(0,1.3fr)]">
         {/* Upcoming appointments column */}
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-5 sm:p-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                Upcoming Appointments
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500">
-                Your scheduled preventative health visits.
-              </p>
-            </div>
+        <Card className="bg-rose-50/40 border-rose-200">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <SectionTitle
+              description="Your scheduled preventative health visits."
+              className="mb-0"
+            >
+              Upcoming Appointments
+            </SectionTitle>
 
             {/* Filter chips */}
             <div className="mt-3 inline-flex flex-wrap gap-2 sm:mt-0">
               {FILTERS.map((filter) => (
-                <button
+                <Button
                   key={filter}
-                  type="button"
+                  variant={activeFilter === filter ? "primary" : "outline"}
+                  size="sm"
                   onClick={() => setActiveFilter(filter)}
-                  className={[
-                    "px-3 py-1.5 rounded-full text-[11px] sm:text-xs border transition-colors",
+                  className={
                     activeFilter === filter
-                      ? "bg-rose-500 text-white border-rose-500"
-                      : "bg-white text-rose-700 border-rose-200 hover:bg-rose-50",
-                  ].join(" ")}
+                      ? "bg-rose-500 border-rose-500 hover:bg-rose-600"
+                      : "text-rose-700 border-rose-200 hover:bg-rose-50 hover:text-rose-800"
+                  }
                 >
                   {filter === "all"
                     ? "All"
                     : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
-          <div className="mt-4 space-y-4">
+          <div className="space-y-4">
             {filteredAppointments.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-rose-200 bg-rose-50 px-4 py-8 text-center text-sm text-rose-500">
                 No appointments for this filter.
@@ -178,43 +226,43 @@ function DashboardProto() {
             )}
           </div>
 
-          <button
-            type="button"
-            className="mt-5 w-full rounded-xl bg-rose-500 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-rose-600"
+          <Button
+            variant="primary"
+            className="mt-5 w-full bg-rose-500 hover:bg-rose-600 text-white shadow-sm"
           >
             Schedule New Appointment
-          </button>
-        </div>
+          </Button>
+        </Card>
 
         {/* Calendar column */}
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-5 sm:p-6 flex flex-col">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
-                Appointment Calendar
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500">
-                November 2024 (static prototype)
-              </p>
-            </div>
+        <Card className="bg-rose-50/40 border-rose-200 flex flex-col h-fit">
+          <div className="flex items-center justify-between mb-4">
+            <SectionTitle
+              description="November 2024 (static prototype)"
+              className="mb-0"
+            >
+              Appointment Calendar
+            </SectionTitle>
             <div className="flex gap-2">
-              <button
-                type="button"
-                className="rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs px-3 py-1 text-rose-700 border-rose-200 hover:bg-rose-50"
               >
                 Previous
-              </button>
-              <button
-                type="button"
-                className="rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-700 hover:bg-rose-50"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs px-3 py-1 text-rose-700 border-rose-200 hover:bg-rose-50"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Very simple static calendar grid */}
-          <div className="mt-4 text-xs text-slate-600">
+          <div className="text-xs text-slate-600">
             <div className="grid grid-cols-7 gap-1 text-center font-medium mb-2">
               <span>Sun</span>
               <span>Mon</span>
@@ -272,7 +320,7 @@ function DashboardProto() {
             <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
             <span>Appointment scheduled</span>
           </div>
-        </div>
+        </Card>
       </section>
     </div>
   );
@@ -299,7 +347,7 @@ function StatCard({ label, value, unit, icon }) {
   const iconChar = icon === "calendar" ? "📅" : icon === "check" ? "✅" : "⚠️";
 
   return (
-    <div className="flex items-center justify-between rounded-3xl border border-rose-200 bg-rose-50/40 px-4 py-4 sm:px-5 sm:py-5">
+    <Card className="flex items-center justify-between bg-rose-50/40 border-rose-200 px-4 py-4 sm:px-5 sm:py-5">
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-rose-500">
           {label}
@@ -312,7 +360,7 @@ function StatCard({ label, value, unit, icon }) {
       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-lg">
         {iconChar}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -329,15 +377,10 @@ function AppointmentCard({ appointment }) {
     phone,
   } = appointment;
 
-  const confirmationStyles =
-    confirmationStatus === "confirmed"
-      ? "bg-rose-500 text-white"
-      : "bg-rose-100 text-rose-700";
-
   const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
-    <article className="rounded-2xl border border-rose-200 bg-white p-4 sm:p-5">
+    <Card className="border-rose-200 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm sm:text-base font-semibold text-slate-900">
@@ -348,14 +391,18 @@ function AppointmentCard({ appointment }) {
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span
-            className={[
-              "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium",
-              confirmationStyles,
-            ].join(" ")}
+          <Badge
+            variant={
+              confirmationStatus === "confirmed" ? "confirmed" : "pending"
+            }
+            className={
+              confirmationStatus === "confirmed"
+                ? "bg-rose-500 text-white"
+                : "bg-rose-100 text-rose-700"
+            }
           >
             {confirmationStatus}
-          </span>
+          </Badge>
           <span className="text-[11px] text-slate-400">{statusLabel}</span>
         </div>
       </div>
@@ -379,20 +426,22 @@ function AppointmentCard({ appointment }) {
       </div>
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <button
-          type="button"
-          className="w-full rounded-full border border-rose-300 bg-white px-4 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50 sm:w-auto"
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full sm:w-auto text-xs border-rose-300 text-rose-700 hover:bg-rose-50"
         >
           Reschedule
-        </button>
-        <button
-          type="button"
-          className="w-full rounded-full border border-rose-300 bg-white px-4 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50 sm:w-auto"
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full sm:w-auto text-xs border-rose-300 text-rose-700 hover:bg-rose-50"
         >
           Cancel
-        </button>
+        </Button>
       </div>
-    </article>
+    </Card>
   );
 }
 

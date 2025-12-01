@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PageHeader from "../components/shared/PageHeader";
+import PageContainer from "../components/shared/PageContainer";
+import PageTitle from "../components/ui/PageTitle";
+import SectionTitle from "../components/ui/SectionTitle";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Select from "../components/ui/Select";
+import Card from "../components/ui/Card";
+import Badge from "../components/ui/Badge";
 
 function OnboardingTemp() {
   const navigate = useNavigate();
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
@@ -13,10 +21,12 @@ function OnboardingTemp() {
     sex: "",
     existingHealthConditions: [],
     currentCondition: "",
-    exerciseFrequency: "",
-    smokingStatus: "",
-    alcoholConsumption: "",
-    dietType: "",
+    lifestyle: {
+      smokingStatus: "",
+      alcoholConsumption: "",
+      exerciseFrequency: "",
+      dietType: "",
+    },
   });
   const [errors, setErrors] = useState({});
   const [isComplete, setIsComplete] = useState(false);
@@ -59,29 +69,50 @@ function OnboardingTemp() {
         newErrors.dateOfBirth = "Please enter a valid date of birth";
       }
     }
-    if (formData.email && formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (
+      formData.email &&
+      formData.email.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+    ) {
       newErrors.email = "Please enter a valid email address";
     }
     if (!formData.sex) {
       newErrors.sex = "Please select your sex";
     }
+
     setErrors(newErrors);
-    // Only block if required fields have errors (name, dateOfBirth, sex)
-    const requiredFieldErrors = ['name', 'dateOfBirth', 'sex'].filter(field => newErrors[field]);
+    const requiredFieldErrors = ["name", "dateOfBirth", "sex"].filter(
+      (field) => newErrors[field]
+    );
     return { isValid: requiredFieldErrors.length === 0, errors: newErrors };
   };
 
   const validateStep2 = () => {
-    // Step 2 questions are optional, so no validation needed
+    // Step 2 questions are optional, so no blocking validation
     return true;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    // Top-level fields
+    if (Object.prototype.hasOwnProperty.call(formData, name)) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+    // Lifestyle nested fields
+    else if (Object.prototype.hasOwnProperty.call(formData.lifestyle, name)) {
+      setFormData((prev) => ({
+        ...prev,
+        lifestyle: {
+          ...prev.lifestyle,
+          [name]: value,
+        },
+      }));
+    }
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => {
@@ -115,87 +146,76 @@ function OnboardingTemp() {
   };
 
   const handleNext = (e) => {
-    if (e) {
-      e.preventDefault();
-    }
+    if (e) e.preventDefault();
+
     if (step === 1) {
       const validation = validateStep1();
-      console.log('Validation result:', validation);
-      console.log('Form data:', formData);
-      if (validation.isValid) {
-        console.log('Moving to step 2');
-        setStep(2);
-      } else {
-        console.log('Validation failed:', validation.errors);
-        // Scroll to first error
+      if (!validation.isValid) {
         const firstErrorField = Object.keys(validation.errors)[0];
         if (firstErrorField) {
           setTimeout(() => {
             const element = document.getElementById(firstErrorField);
             if (element) {
-              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              element.scrollIntoView({ behavior: "smooth", block: "center" });
               element.focus();
             }
           }, 100);
         }
+        return;
       }
+    }
+
+    if (step === 2) {
+      if (!validateStep2()) return;
+    }
+
+    if (step < 3) {
+      setStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
+    setStep((prev) => (prev > 1 ? prev - 1 : prev));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateStep2()) {
-      // Calculate age from date of birth
-      const age = calculateAge(formData.dateOfBirth);
+    if (step !== 3) return;
 
-      // Store in localStorage
-      const userData = {
-        ...formData,
-        age: age,
-        submittedAt: new Date().toISOString(),
-        id: Date.now(),
-      };
+    // Calculate age from date of birth
+    const age = calculateAge(formData.dateOfBirth);
 
-      // Get existing users array or create new one
-      const existingData = localStorage.getItem("onboardingData");
-      let usersArray = [];
+    // Store in localStorage
+    const userData = {
+      ...formData,
+      age,
+      submittedAt: new Date().toISOString(),
+      id: Date.now(),
+    };
 
-      if (existingData) {
-        try {
-          const parsed = JSON.parse(existingData);
-          usersArray = Array.isArray(parsed) ? parsed : [parsed];
-        } catch (e) {
-          console.error("Error parsing existing data:", e);
-          usersArray = [];
-        }
+    const existingData = localStorage.getItem("onboardingData");
+    let usersArray = [];
+
+    if (existingData) {
+      try {
+        const parsed = JSON.parse(existingData);
+        usersArray = Array.isArray(parsed) ? parsed : [parsed];
+      } catch (err) {
+        console.error("Error parsing existing data:", err);
+        usersArray = [];
       }
-
-      // Add new user to array
-      usersArray.push(userData);
-
-      // Save updated array
-      localStorage.setItem("onboardingData", JSON.stringify(usersArray));
-      setIsComplete(true);
     }
+
+    usersArray.push(userData);
+    localStorage.setItem("onboardingData", JSON.stringify(usersArray));
+    setIsComplete(true);
   };
 
   // Setup Complete screen
   if (isComplete) {
     return (
-      <div className="space-y-6">
-        <PageHeader
-          title="Setup Complete!"
-          description="Your onboarding information has been saved successfully."
-          variant="compact"
-        />
-
-        <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-6 sm:p-8 text-center">
+      <PageContainer>
+        <Card className="text-center p-8">
           <div className="mb-6">
             <div className="mx-auto w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4">
               <svg
@@ -212,210 +232,125 @@ function OnboardingTemp() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-2">
-              Welcome to Lifeyears!
-            </h2>
+            <PageTitle className="mb-2">Welcome to Lifeyears!</PageTitle>
             <p className="text-sm sm:text-base text-slate-500">
-              Redirecting to your dashboard in a few seconds...
+              Your onboarding information has been saved successfully. Redirecting
+              to your dashboard in a few seconds...
             </p>
           </div>
-
-          <button
+          <Button
             onClick={() => navigate("/dashboard")}
-            className="w-full sm:w-auto rounded-xl bg-rose-500 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-rose-600 transition-colors"
+            variant="primary"
+            className="mt-4"
           >
             Go to Dashboard
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Card>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <PageHeader
-        title="Onboarding"
-        description={`Step ${step} of 2: Please provide your information to get started`}
-        variant="compact"
+    <PageContainer>
+      <PageTitle
+        description={`Step ${step} of 3: Please provide your information to get started`}
       >
-        {/* Progress bar */}
-        <div className="mt-4 w-full bg-rose-100 rounded-full h-2">
-          <div
-            className="bg-rose-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(step / 2) * 100}%` }}
-          ></div>
-        </div>
-      </PageHeader>
+        Onboarding
+      </PageTitle>
 
-      {/* Form card */}
-      <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-5 sm:p-6">
-        <form onSubmit={handleSubmit}>
+      {/* Progress bar */}
+      <div className="mt-4 mb-6 w-full bg-gray-200 rounded-full h-2">
+        <div
+          className="bg-brand-600 h-2 rounded-full transition-all duration-300"
+          style={{ width: `${(step / 3) * 100}%` }}
+        ></div>
+      </div>
+
+      <Card>
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Step 1: Basic Information */}
           {step === 1 && (
-            <div className="space-y-5">
-              <div>
-                <h2 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">
-                  Basic Information
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-500 mb-5">
-                  Let's start with some basic information about you.
-                </p>
-              </div>
+            <div className="space-y-6">
+              <SectionTitle>Basic Information</SectionTitle>
 
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                >
-                  Full Name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors ${
-                    errors.name
-                      ? "border-rose-500 bg-rose-50"
-                      : "border-rose-200 bg-white"
-                  }`}
-                  placeholder="Enter your full name"
-                />
-                {errors.name && (
-                  <p className="mt-1.5 text-xs text-rose-600">{errors.name}</p>
-                )}
-              </div>
+              <Input
+                label="Full Name"
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                error={errors.name}
+                placeholder="Enter your full name"
+                required
+              />
 
-              <div>
-                <label
-                  htmlFor="dateOfBirth"
-                  className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                >
-                  Date of Birth <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange}
-                  max={new Date().toISOString().split("T")[0]}
-                  className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors ${
-                    errors.dateOfBirth
-                      ? "border-rose-500 bg-rose-50"
-                      : "border-rose-200 bg-white"
-                  }`}
-                />
-                {errors.dateOfBirth && (
-                  <p className="mt-1.5 text-xs text-rose-600">
-                    {errors.dateOfBirth}
-                  </p>
-                )}
-                {formData.dateOfBirth && !errors.dateOfBirth && (
-                  <p className="mt-1.5 text-xs text-slate-500">
-                    Age: {calculateAge(formData.dateOfBirth)} years
-                  </p>
-                )}
-              </div>
+              <Input
+                label="Date of Birth"
+                type="date"
+                id="dateOfBirth"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+                max={new Date().toISOString().split("T")[0]}
+                error={errors.dateOfBirth}
+                required
+              />
 
-              <div>
-                <label
-                  htmlFor="phoneNumber"
-                  className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                >
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-rose-200 bg-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors"
-                  placeholder="+1 (555) 123-4567"
-                />
-              </div>
+              <Input
+                label="Email Address"
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                error={errors.email}
+                placeholder="your.email@example.com"
+              />
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                >
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors ${
-                    errors.email
-                      ? "border-rose-500 bg-rose-50"
-                      : "border-rose-200 bg-white"
-                  }`}
-                  placeholder="your.email@example.com"
-                />
-                {errors.email && (
-                  <p className="mt-1.5 text-xs text-rose-600">{errors.email}</p>
-                )}
-              </div>
+              <Input
+                label="Phone Number (Optional)"
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+                placeholder="+1 (555) 123-4567"
+              />
 
-              <div>
-                <label
-                  htmlFor="sex"
-                  className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                >
-                  Sex <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  id="sex"
-                  name="sex"
-                  value={formData.sex}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors ${
-                    errors.sex
-                      ? "border-rose-500 bg-rose-50"
-                      : "border-rose-200 bg-white"
-                  }`}
-                >
-                  <option value="">Select...</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                </select>
-                {errors.sex && (
-                  <p className="mt-1.5 text-xs text-rose-600">{errors.sex}</p>
-                )}
-              </div>
+              <Select
+                label="Sex"
+                id="sex"
+                name="sex"
+                value={formData.sex}
+                onChange={handleInputChange}
+                error={errors.sex}
+                required
+                options={[
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "other", label: "Other" },
+                  { value: "prefer-not-to-say", label: "Prefer not to say" },
+                ]}
+              />
             </div>
           )}
 
-          {/* Step 2: Medical History & Habits */}
+          {/* Step 2: Health & Lifestyle */}
           {step === 2 && (
-            <div className="space-y-5">
-              <div>
-                <h2 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">
-                  Medical History & Habits
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-500 mb-5">
-                  Help us understand your health history and lifestyle better.
-                </p>
-              </div>
+            <div className="space-y-6">
+              <SectionTitle>Health Information</SectionTitle>
 
               {/* Medical History */}
               <div>
                 <label
                   htmlFor="currentCondition"
-                  className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Existing Health Conditions
                 </label>
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     id="currentCondition"
                     name="currentCondition"
@@ -427,166 +362,194 @@ function OnboardingTemp() {
                         addHealthCondition();
                       }
                     }}
-                    className="flex-1 px-4 py-2.5 border border-rose-200 bg-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors"
                     placeholder="e.g., Hypertension, Diabetes"
+                    className="flex-1"
                   />
-                  <button
-                    type="button"
-                    onClick={addHealthCondition}
-                    className="px-4 py-2.5 rounded-xl bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 transition-colors"
-                  >
+                  <Button type="button" onClick={addHealthCondition} variant="primary">
                     Add
-                  </button>
+                  </Button>
                 </div>
                 {formData.existingHealthConditions.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {formData.existingHealthConditions.map((condition, index) => (
-                      <span
+                      <Badge
                         key={index}
-                        className="inline-flex items-center px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-medium"
+                        variant="pending"
+                        className="bg-brand-100 text-brand-800"
                       >
                         {condition}
                         <button
                           type="button"
                           onClick={() => removeHealthCondition(index)}
-                          className="ml-2 text-rose-600 hover:text-rose-800"
+                          className="ml-2 text-brand-600 hover:text-brand-800 font-bold"
                         >
                           ×
                         </button>
-                      </span>
+                      </Badge>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Habits */}
-              <div className="space-y-4 pt-2">
-                <div>
-                  <label
-                    htmlFor="exerciseFrequency"
-                    className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                  >
-                    Exercise Frequency
-                  </label>
-                  <select
-                    id="exerciseFrequency"
-                    name="exerciseFrequency"
-                    value={formData.exerciseFrequency}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-rose-200 bg-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors"
-                  >
-                    <option value="">Select...</option>
-                    <option value="none">None</option>
-                    <option value="1-2 times per week">1-2 times per week</option>
-                    <option value="3-4 times per week">3-4 times per week</option>
-                    <option value="5+ times per week">5+ times per week</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="smokingStatus"
-                    className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                  >
-                    Smoking Status
-                  </label>
-                  <select
+              {/* Lifestyle */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Lifestyle Information
+                </label>
+                <div className="space-y-4">
+                  <Select
+                    label="Smoking Status"
                     id="smokingStatus"
                     name="smokingStatus"
-                    value={formData.smokingStatus}
+                    value={formData.lifestyle.smokingStatus}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-rose-200 bg-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors"
-                  >
-                    <option value="">Select...</option>
-                    <option value="never">Never smoked</option>
-                    <option value="former">Former smoker</option>
-                    <option value="current">Current smoker</option>
-                  </select>
-                </div>
+                    options={[
+                      { value: "never", label: "Never smoked" },
+                      { value: "former", label: "Former smoker" },
+                      { value: "current", label: "Current smoker" },
+                    ]}
+                  />
 
-                <div>
-                  <label
-                    htmlFor="alcoholConsumption"
-                    className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                  >
-                    Alcohol Consumption
-                  </label>
-                  <select
+                  <Select
+                    label="Alcohol Consumption"
                     id="alcoholConsumption"
                     name="alcoholConsumption"
-                    value={formData.alcoholConsumption}
+                    value={formData.lifestyle.alcoholConsumption}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-rose-200 bg-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors"
-                  >
-                    <option value="">Select...</option>
-                    <option value="none">None</option>
-                    <option value="occasional">Occasional</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="heavy">Heavy</option>
-                  </select>
-                </div>
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "occasional", label: "Occasional" },
+                      { value: "moderate", label: "Moderate" },
+                      { value: "heavy", label: "Heavy" },
+                    ]}
+                  />
 
-                <div>
-                  <label
-                    htmlFor="dietType"
-                    className="block text-xs sm:text-sm font-medium text-slate-700 mb-2"
-                  >
-                    Diet Type
-                  </label>
-                  <select
+                  <Select
+                    label="Exercise Frequency"
+                    id="exerciseFrequency"
+                    name="exerciseFrequency"
+                    value={formData.lifestyle.exerciseFrequency}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "1-2 times per week", label: "1-2 times per week" },
+                      { value: "2-3 times per week", label: "2-3 times per week" },
+                      { value: "3-5 times per week", label: "3-5 times per week" },
+                      { value: "daily", label: "Daily" },
+                    ]}
+                  />
+
+                  <Select
+                    label="Diet Type"
                     id="dietType"
                     name="dietType"
-                    value={formData.dietType}
+                    value={formData.lifestyle.dietType}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-rose-200 bg-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-colors"
-                  >
-                    <option value="">Select...</option>
-                    <option value="mixed">Mixed / Standard</option>
-                    <option value="vegetarian">Vegetarian</option>
-                    <option value="vegan">Vegan</option>
-                    <option value="mediterranean">Mediterranean</option>
-                    <option value="keto">Keto</option>
-                    <option value="other">Other</option>
-                  </select>
+                    options={[
+                      { value: "mixed", label: "Mixed / Standard" },
+                      { value: "vegetarian", label: "Vegetarian" },
+                      { value: "vegan", label: "Vegan" },
+                      { value: "mediterranean", label: "Mediterranean" },
+                      { value: "keto", label: "Keto" },
+                      { value: "other", label: "Other" },
+                    ]}
+                  />
                 </div>
               </div>
             </div>
           )}
 
+          {/* Step 3: Review */}
+          {step === 3 && (
+            <div className="space-y-6">
+              <SectionTitle>Review Your Information</SectionTitle>
+
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Name:
+                  </span>{" "}
+                  <span className="text-gray-900">{formData.name}</span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Email:
+                  </span>{" "}
+                  <span className="text-gray-900">{formData.email}</span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Date of Birth:
+                  </span>{" "}
+                  <span className="text-gray-900">{formData.dateOfBirth}</span>
+                </div>
+                {formData.phoneNumber && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Phone:
+                    </span>{" "}
+                    <span className="text-gray-900">
+                      {formData.phoneNumber}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Sex:
+                  </span>{" "}
+                  <span className="text-gray-900 capitalize">
+                    {formData.sex}
+                  </span>
+                </div>
+                {formData.existingHealthConditions.length > 0 && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Health Conditions:
+                    </span>{" "}
+                    <span className="text-gray-900">
+                      {formData.existingHealthConditions.join(", ")}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  Please review your information carefully. You can go back to
+                  make changes, or click "Complete Setup" to finish.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Navigation Buttons */}
-          <div className="mt-8 flex flex-col-reverse sm:flex-row justify-between gap-3">
-            <button
+          <div className="mt-8 flex justify-between">
+            <Button
               type="button"
               onClick={handleBack}
               disabled={step === 1}
-              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-medium transition-colors ${
-                step === 1
-                  ? "bg-rose-100 text-rose-300 cursor-not-allowed"
-                  : "bg-white text-rose-700 border border-rose-200 hover:bg-rose-50"
-              }`}
+              variant="secondary"
+              className={step === 1 ? "cursor-not-allowed opacity-50" : ""}
             >
               Back
-            </button>
-            {step < 2 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="w-full sm:w-auto rounded-xl bg-rose-500 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-rose-600 transition-colors"
-              >
+            </Button>
+            {step < 3 ? (
+              <Button type="button" onClick={handleNext} variant="primary">
                 Next
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 type="submit"
-                className="w-full sm:w-auto rounded-xl bg-rose-500 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-rose-600 transition-colors"
+                variant="primary"
+                className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
               >
                 Complete Setup
-              </button>
+              </Button>
             )}
           </div>
         </form>
-      </div>
-    </div>
+      </Card>
+    </PageContainer>
   );
 }
 
