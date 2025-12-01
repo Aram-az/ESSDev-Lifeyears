@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PageContainer from "../components/shared/PageContainer";
 import PageTitle from "../components/ui/PageTitle";
 import SectionTitle from "../components/ui/SectionTitle";
@@ -9,16 +10,17 @@ import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 
 function OnboardingTemp() {
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     dateOfBirth: "",
-    email: "",
     phoneNumber: "",
+    email: "",
     sex: "",
     existingHealthConditions: [],
     currentCondition: "",
-    familyHistory: [],
     lifestyle: {
       smokingStatus: "",
       alcoholConsumption: "",
@@ -29,123 +31,15 @@ function OnboardingTemp() {
   const [errors, setErrors] = useState({});
   const [isComplete, setIsComplete] = useState(false);
 
-  const validateStep1 = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+  // Auto-redirect to dashboard after 3 seconds when complete
+  useEffect(() => {
+    if (isComplete) {
+      const timer = setTimeout(() => {
+        navigate("/dashboard");
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-    if (!formData.dateOfBirth) {
-      newErrors.dateOfBirth = "Date of birth is required";
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-    if (!formData.sex) {
-      newErrors.sex = "Please select your sex";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name.startsWith("lifestyle.")) {
-      const lifestyleKey = name.split(".")[1];
-      setFormData((prev) => ({
-        ...prev,
-        lifestyle: {
-          ...prev.lifestyle,
-          [lifestyleKey]: value,
-        },
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
-  const addHealthCondition = () => {
-    if (formData.currentCondition.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        existingHealthConditions: [
-          ...prev.existingHealthConditions,
-          formData.currentCondition.trim(),
-        ],
-        currentCondition: "",
-      }));
-    }
-  };
-
-  const removeHealthCondition = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      existingHealthConditions: prev.existingHealthConditions.filter(
-        (_, i) => i !== index
-      ),
-    }));
-  };
-
-  const handleNext = () => {
-    if (step === 1) {
-      if (validateStep1()) {
-        setStep(2);
-      }
-    } else if (step === 2) {
-      setStep(3);
-    }
-  };
-
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Store in localStorage as an array
-    const userData = {
-      ...formData,
-      age: calculateAge(formData.dateOfBirth),
-      submittedAt: new Date().toISOString(),
-      id: Date.now(), // Add unique ID for each user
-    };
-
-    // Get existing users array or create new one
-    const existingData = localStorage.getItem("onboardingData");
-    let usersArray = [];
-
-    if (existingData) {
-      try {
-        const parsed = JSON.parse(existingData);
-        // Handle both old format (single object) and new format (array)
-        usersArray = Array.isArray(parsed) ? parsed : [parsed];
-      } catch (e) {
-        console.error("Error parsing existing data:", e);
-        usersArray = [];
-      }
-    }
-
-    // Add new user to array
-    usersArray.push(userData);
-
-    // Save updated array
-    localStorage.setItem("onboardingData", JSON.stringify(usersArray));
-    setIsComplete(true);
-  };
+  }, [isComplete, navigate]);
 
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return null;
@@ -162,14 +56,170 @@ function OnboardingTemp() {
     return age;
   };
 
+  const validateStep1 = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = "Date of birth is required";
+    } else {
+      const age = calculateAge(formData.dateOfBirth);
+      if (age < 0 || age > 150) {
+        newErrors.dateOfBirth = "Please enter a valid date of birth";
+      }
+    }
+    if (
+      formData.email &&
+      formData.email.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+    ) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    if (!formData.sex) {
+      newErrors.sex = "Please select your sex";
+    }
+
+    setErrors(newErrors);
+    const requiredFieldErrors = ["name", "dateOfBirth", "sex"].filter(
+      (field) => newErrors[field]
+    );
+    return { isValid: requiredFieldErrors.length === 0, errors: newErrors };
+  };
+
+  const validateStep2 = () => {
+    // Step 2 questions are optional, so no blocking validation
+    return true;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Top-level fields
+    if (Object.prototype.hasOwnProperty.call(formData, name)) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+    // Lifestyle nested fields
+    else if (Object.prototype.hasOwnProperty.call(formData.lifestyle, name)) {
+      setFormData((prev) => ({
+        ...prev,
+        lifestyle: {
+          ...prev.lifestyle,
+          [name]: value,
+        },
+      }));
+    }
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const addHealthCondition = () => {
+    if (formData.currentCondition.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        existingHealthConditions: [
+          ...prev.existingHealthConditions,
+          prev.currentCondition.trim(),
+        ],
+        currentCondition: "",
+      }));
+    }
+  };
+
+  const removeHealthCondition = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      existingHealthConditions: prev.existingHealthConditions.filter(
+        (_, i) => i !== index
+      ),
+    }));
+  };
+
+  const handleNext = (e) => {
+    if (e) e.preventDefault();
+
+    if (step === 1) {
+      const validation = validateStep1();
+      if (!validation.isValid) {
+        const firstErrorField = Object.keys(validation.errors)[0];
+        if (firstErrorField) {
+          setTimeout(() => {
+            const element = document.getElementById(firstErrorField);
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth", block: "center" });
+              element.focus();
+            }
+          }, 100);
+        }
+        return;
+      }
+    }
+
+    if (step === 2) {
+      if (!validateStep2()) return;
+    }
+
+    if (step < 3) {
+      setStep((prev) => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    setStep((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (step !== 3) return;
+
+    // Calculate age from date of birth
+    const age = calculateAge(formData.dateOfBirth);
+
+    // Store in localStorage
+    const userData = {
+      ...formData,
+      age,
+      submittedAt: new Date().toISOString(),
+      id: Date.now(),
+    };
+
+    const existingData = localStorage.getItem("onboardingData");
+    let usersArray = [];
+
+    if (existingData) {
+      try {
+        const parsed = JSON.parse(existingData);
+        usersArray = Array.isArray(parsed) ? parsed : [parsed];
+      } catch (err) {
+        console.error("Error parsing existing data:", err);
+        usersArray = [];
+      }
+    }
+
+    usersArray.push(userData);
+    localStorage.setItem("onboardingData", JSON.stringify(usersArray));
+    setIsComplete(true);
+  };
+
+  // Setup Complete screen
   if (isComplete) {
     return (
       <PageContainer>
         <Card className="text-center p-8">
           <div className="mb-6">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4">
               <svg
-                className="w-8 h-8 text-green-600"
+                className="w-8 h-8 text-rose-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -182,72 +232,18 @@ function OnboardingTemp() {
                 />
               </svg>
             </div>
-            <PageTitle className="mb-2">Setup Complete!</PageTitle>
-            <p className="text-gray-600 mb-6">
-              Your onboarding information has been saved successfully.
+            <PageTitle className="mb-2">Welcome to Lifeyears!</PageTitle>
+            <p className="text-sm sm:text-base text-slate-500">
+              Your onboarding information has been saved successfully. Redirecting
+              to your dashboard in a few seconds...
             </p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Summary of Your Information
-            </h2>
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="font-semibold">Name:</span> {formData.name}
-              </p>
-              <p>
-                <span className="font-semibold">Email:</span> {formData.email}
-              </p>
-              <p>
-                <span className="font-semibold">Date of Birth:</span>{" "}
-                {formData.dateOfBirth}
-              </p>
-              <p>
-                <span className="font-semibold">Age:</span>{" "}
-                {calculateAge(formData.dateOfBirth)} years
-              </p>
-              {formData.phoneNumber && (
-                <p>
-                  <span className="font-semibold">Phone:</span>{" "}
-                  {formData.phoneNumber}
-                </p>
-              )}
-              <p>
-                <span className="font-semibold">Sex:</span>{" "}
-                {formData.sex.charAt(0).toUpperCase() + formData.sex.slice(1)}
-              </p>
-              {formData.existingHealthConditions.length > 0 && (
-                <p>
-                  <span className="font-semibold">Health Conditions:</span>{" "}
-                  {formData.existingHealthConditions.join(", ")}
-                </p>
-              )}
-            </div>
-          </div>
           <Button
-            onClick={() => {
-              setIsComplete(false);
-              setStep(1);
-              setFormData({
-                name: "",
-                dateOfBirth: "",
-                email: "",
-                phoneNumber: "",
-                sex: "",
-                existingHealthConditions: [],
-                currentCondition: "",
-                familyHistory: [],
-                lifestyle: {
-                  smokingStatus: "",
-                  alcoholConsumption: "",
-                  exerciseFrequency: "",
-                  dietType: "",
-                },
-              });
-            }}
+            onClick={() => navigate("/dashboard")}
             variant="primary"
+            className="mt-4"
           >
-            Start Over
+            Go to Dashboard
           </Button>
         </Card>
       </PageContainer>
@@ -262,6 +258,7 @@ function OnboardingTemp() {
         Onboarding
       </PageTitle>
 
+      {/* Progress bar */}
       <div className="mt-4 mb-6 w-full bg-gray-200 rounded-full h-2">
         <div
           className="bg-brand-600 h-2 rounded-full transition-all duration-300"
@@ -309,7 +306,6 @@ function OnboardingTemp() {
                 onChange={handleInputChange}
                 error={errors.email}
                 placeholder="your.email@example.com"
-                required
               />
 
               <Input
@@ -319,7 +315,7 @@ function OnboardingTemp() {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                placeholder="+1-555-0123"
+                placeholder="+1 (555) 123-4567"
               />
 
               <Select
@@ -340,11 +336,12 @@ function OnboardingTemp() {
             </div>
           )}
 
-          {/* Step 2: Health Conditions */}
+          {/* Step 2: Health & Lifestyle */}
           {step === 2 && (
             <div className="space-y-6">
               <SectionTitle>Health Information</SectionTitle>
 
+              {/* Medical History */}
               <div>
                 <label
                   htmlFor="currentCondition"
@@ -365,41 +362,36 @@ function OnboardingTemp() {
                         addHealthCondition();
                       }
                     }}
-                    placeholder="Enter a health condition (e.g., Hypertension)"
+                    placeholder="e.g., Hypertension, Diabetes"
                     className="flex-1"
                   />
-                  <Button
-                    type="button"
-                    onClick={addHealthCondition}
-                    variant="primary"
-                  >
+                  <Button type="button" onClick={addHealthCondition} variant="primary">
                     Add
                   </Button>
                 </div>
                 {formData.existingHealthConditions.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {formData.existingHealthConditions.map(
-                      (condition, index) => (
-                        <Badge
-                          key={index}
-                          variant="pending"
-                          className="bg-brand-100 text-brand-800"
+                    {formData.existingHealthConditions.map((condition, index) => (
+                      <Badge
+                        key={index}
+                        variant="pending"
+                        className="bg-brand-100 text-brand-800"
+                      >
+                        {condition}
+                        <button
+                          type="button"
+                          onClick={() => removeHealthCondition(index)}
+                          className="ml-2 text-brand-600 hover:text-brand-800 font-bold"
                         >
-                          {condition}
-                          <button
-                            type="button"
-                            onClick={() => removeHealthCondition(index)}
-                            className="ml-2 text-brand-600 hover:text-brand-800 font-bold"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      )
-                    )}
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
                   </div>
                 )}
               </div>
 
+              {/* Lifestyle */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Lifestyle Information
@@ -407,7 +399,8 @@ function OnboardingTemp() {
                 <div className="space-y-4">
                   <Select
                     label="Smoking Status"
-                    name="lifestyle.smokingStatus"
+                    id="smokingStatus"
+                    name="smokingStatus"
                     value={formData.lifestyle.smokingStatus}
                     onChange={handleInputChange}
                     options={[
@@ -419,7 +412,8 @@ function OnboardingTemp() {
 
                   <Select
                     label="Alcohol Consumption"
-                    name="lifestyle.alcoholConsumption"
+                    id="alcoholConsumption"
+                    name="alcoholConsumption"
                     value={formData.lifestyle.alcoholConsumption}
                     onChange={handleInputChange}
                     options={[
@@ -432,7 +426,8 @@ function OnboardingTemp() {
 
                   <Select
                     label="Exercise Frequency"
-                    name="lifestyle.exerciseFrequency"
+                    id="exerciseFrequency"
+                    name="exerciseFrequency"
                     value={formData.lifestyle.exerciseFrequency}
                     onChange={handleInputChange}
                     options={[
@@ -446,11 +441,12 @@ function OnboardingTemp() {
 
                   <Select
                     label="Diet Type"
-                    name="lifestyle.dietType"
+                    id="dietType"
+                    name="dietType"
                     value={formData.lifestyle.dietType}
                     onChange={handleInputChange}
                     options={[
-                      { value: "mixed", label: "Mixed" },
+                      { value: "mixed", label: "Mixed / Standard" },
                       { value: "vegetarian", label: "Vegetarian" },
                       { value: "vegan", label: "Vegan" },
                       { value: "mediterranean", label: "Mediterranean" },
@@ -542,7 +538,11 @@ function OnboardingTemp() {
                 Next
               </Button>
             ) : (
-              <Button type="submit" variant="primary" className="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+              <Button
+                type="submit"
+                variant="primary"
+                className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
+              >
                 Complete Setup
               </Button>
             )}
