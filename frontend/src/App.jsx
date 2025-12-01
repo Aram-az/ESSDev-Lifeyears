@@ -7,6 +7,7 @@ import DashboardProto from "./pages/DashboardProto.jsx";
 import OnboardingTemp from "./pages/OnboardingTemp.jsx";
 import Profile from "./pages/Profile.jsx";
 import Demo from "./pages/Demo.jsx";
+import StyleguideTemp from "./pages/StyleguideTemp.jsx";
 
 function App() {
   return (
@@ -52,6 +53,16 @@ function App() {
           element={
             <Layout>
               <Demo />
+            </Layout>
+          }
+        />
+
+        {/* Design system playground */}
+        <Route
+          path="/styleguide-temp"
+          element={
+            <Layout>
+              <StyleguideTemp />
             </Layout>
           }
         />
