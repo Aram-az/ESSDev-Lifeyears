@@ -86,7 +86,8 @@ function Navbar() {
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
-              aria-expanded="false"
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle navigation menu"
             >
               <span className="sr-only">Open main menu</span>
               {!isMenuOpen ? (
