@@ -336,7 +336,6 @@ function StyleguideTemp() {
             </div>
           </Card>
         </section>
-      </div>
     </div>
   );
 }
