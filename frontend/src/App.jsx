@@ -7,7 +7,6 @@ import DashboardProto from "./pages/DashboardProto.jsx";
 import OnboardingTemp from "./pages/OnboardingTemp.jsx";
 import Profile from "./pages/Profile.jsx";
 import Demo from "./pages/Demo.jsx";
-import DashboardProto from "./pages/DashboardProto.jsx"; // new sprint-2 page
 import StyleguideTemp from "./pages/StyleguideTemp.jsx";
 
 function App() {
