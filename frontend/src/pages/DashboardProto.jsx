@@ -30,7 +30,7 @@ function DashboardProto() {
         console.log("Mock API /mock-user:", userRes);
         console.log("Mock API /mock-recommendations:", recs);
 
-        setUser(userRes);
+        setUser(userRes?.data ?? userRes);
 
         const list = Array.isArray(recs)
           ? recs
