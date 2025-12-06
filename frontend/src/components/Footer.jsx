@@ -64,8 +64,8 @@ function Footer() {
               Contact
             </h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li>Email: text@placeholder.com</li>
-              <li>Phone: (123) 456-7890</li>
+              <li>Email: essdev@engsoc.queensu.ca</li>
+              <li>Phone: (613) 533-6008 </li>
             </ul>
           </div>
         </div>
