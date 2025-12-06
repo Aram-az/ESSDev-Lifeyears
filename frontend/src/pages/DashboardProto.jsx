@@ -27,8 +27,6 @@ function DashboardProto() {
           getMockUser(),
           getMockRecommendations(),
         ]);
-        console.log("Mock API /mock-user:", userRes);
-        console.log("Mock API /mock-recommendations:", recs);
 
         setUser(userRes?.data ?? userRes);
 
